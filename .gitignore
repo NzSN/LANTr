@@ -1,0 +1,6 @@
+# Bazel generated files
+bazel-bin
+bazel-LANTr
+bazel-out
+bazel-testlogs
+MODULE.bazel.lock
