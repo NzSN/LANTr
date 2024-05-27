@@ -4,3 +4,7 @@ bazel-LANTr
 bazel-out
 bazel-testlogs
 MODULE.bazel.lock
+
+# ccls
+.ccls
+.ccls-cache
