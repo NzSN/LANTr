@@ -14,7 +14,7 @@ namespace Bottom {
 enum Reason {
   FIRST_REASON = 0,
   NOT_IMPLEMENTED = FIRST_REASON,
-  LAST_REASON
+  END_OF_REASON
 };
 
 namespace {
@@ -35,7 +35,7 @@ private:
 
 void Unreachable(Reason reason) {
   ASSERT(reason_ >= Reason::FIRST_REASON &&
-         reason_ <= Reason::LAST_REASON,
+         reason_ < Reason::END_OF_REASON,
          "Not recognized reason");
 
   throw ReachBottom(reason);
