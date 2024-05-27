@@ -6,14 +6,11 @@
 
 namespace LANTr::Api {
 
-namespace {
-using Base::Utility::Bottom::Unreachable;
-using Base::Utility::Bottom::Reason;
-}
+namespace Bottom = Base::Utility::Bottom;
 
 template<LANG lang>
 Source LANTr<lang>::trans(Source s) {
-  Unreachable(Reason::NOT_IMPLEMENTED);
+  Bottom::Unreachable(Bottom::Reason::NOT_IMPLEMENTED);
 }
 
 } // LANTr::Api
