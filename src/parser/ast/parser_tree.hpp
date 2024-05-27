@@ -5,7 +5,9 @@
 
 namespace LANTr::Parser::AST {
 
+class ParseTree {
 
+};
 
 } // LANTr::Parser::AST
 
