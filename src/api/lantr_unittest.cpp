@@ -7,14 +7,10 @@
 namespace LANTr::Api {
 
 RC_GTEST_PROP(LANTrApp, Main, ()) {
-  LANTrConfigs configs{};
   LANTr<LANG::TypeScript> tr{
-    {
-      // Rewrite Rules
-      {"Hello", "World"},
-      {"World", "Hello"}
-    },
-    configs
+    // Rewrite Rules
+    {"Hello", "World"},
+    {"World", "Hello"},
   };
 
   Base::Types::Source source{
