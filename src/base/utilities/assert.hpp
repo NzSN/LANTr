@@ -11,7 +11,8 @@
     if (!(COND)) {                                   \
       std::cerr << "Failed to assert: "              \
                 << MSG                               \
-                << "at " + __FILE__ + ":" + __LINE__ \
+                << std::string("at ") + __FILE__ + ":"            \
+                   + std::to_string(__LINE__)        \
                 << std::endl;                        \
       std::abort();                                  \
     }                                                \

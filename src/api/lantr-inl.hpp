@@ -4,9 +4,15 @@
 #include "lantr.hpp"
 #include "base/utility.hpp"
 
-namespace Bottom = LANTr::Base::Utility::Bottom;
-
 namespace LANTr::Api {
+
+namespace {
+namespace Bottom = Base::Utility::Bottom;
+}
+
+template<LANG lang>
+LANTr<lang>::LANTr(std::initializer_list<RewriteRule> rules):
+  rules_{rules} {}
 
 template<LANG lang>
 Source LANTr<lang>::trans(Source s) {
