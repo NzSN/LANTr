@@ -6,7 +6,9 @@
 
 namespace LANTr::Api {
 
+namespace {
 namespace Bottom = Base::Utility::Bottom;
+}
 
 template<LANG lang>
 Source LANTr<lang>::trans(Source s) {
