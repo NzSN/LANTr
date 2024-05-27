@@ -5,9 +5,8 @@
 
 namespace LANTr::Parser::AST {
 
-class ParseTree {
-
-};
+template<typename T>
+class ParseTree {};
 
 } // LANTr::Parser::AST
 
