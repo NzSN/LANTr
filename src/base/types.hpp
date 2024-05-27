@@ -9,5 +9,4 @@ using Source = std::string;
 
 } // LANTr::Base::Types
 
-
 #endif /* LANTR_BASE_TYPES */
