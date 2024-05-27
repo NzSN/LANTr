@@ -5,7 +5,9 @@
 
 namespace LANTr::Api {
 
+namespace {
 using Source = Base::Types::Source;
+}
 
 enum LANG {
   BEGIN_OF_LANG = 0,
