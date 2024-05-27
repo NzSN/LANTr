@@ -41,12 +41,6 @@ public:
     this->where_ = other.where_;
   }
 
-  RewriteRule(RewriteRule&& other) {
-    this->sPattern_ = std::move(other.sPattern_);
-    this->tPattern_ = std::move(other.tPattern_);
-    this->where_ = std::move(other.where_);
-  }
-
   const Source source() const {
     return sPattern_;
   }
