@@ -1,7 +1,6 @@
 filegroup(
     name = "utilities",
-    srcs = ["types.hpp",
-            "utilities/assert.hpp",
+    srcs = ["utilities/assert.hpp",
             "utilities/bottom.hpp"],
     visibility = ["//visibility:public"]
 )
@@ -16,5 +15,6 @@ cc_library(
     name = "base",
     hdrs = [":types",
             ":utilities"],
+    include_prefix = "base",
     visibility = ["//visibility:public"]
 )

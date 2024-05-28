@@ -21,10 +21,9 @@ cc_test(
          ":api",
          ":api_tests"
          ],
-    copts = ["-Isrc"],
     deps = [
          "@com_google_googletest//:gtest_main",
          "@rapidcheck//:rapidcheck",
-         "//src/base:base"
+         "//src/base:base",
          ]
 )
