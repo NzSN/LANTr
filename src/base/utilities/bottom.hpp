@@ -34,8 +34,8 @@ private:
 }
 
 void Unreachable(Reason reason) {
-  ASSERT(reason_ >= Reason::FIRST_REASON &&
-         reason_ < Reason::END_OF_REASON,
+  ASSERT(reason >= Reason::FIRST_REASON &&
+         reason < Reason::END_OF_REASON,
          "Not recognized reason");
 
   throw ReachBottom(reason);

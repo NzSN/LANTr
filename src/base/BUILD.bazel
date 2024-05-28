@@ -1,0 +1,20 @@
+filegroup(
+    name = "utilities",
+    srcs = ["types.hpp",
+            "utilities/assert.hpp",
+            "utilities/bottom.hpp"],
+    visibility = ["//visibility:public"]
+)
+
+filegroup(
+    name = "types",
+    srcs = ["types.hpp"],
+    visibility = ["//visibility:public"]
+)
+
+cc_library(
+    name = "base",
+    hdrs = [":types",
+            ":utilities"],
+    visibility = ["//visibility:public"]
+)
