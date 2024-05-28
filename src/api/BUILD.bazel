@@ -1,0 +1,30 @@
+filegroup(
+    name = "api",
+    srcs = [
+         # LANTr
+         "lantr.hpp",
+         "lantr-inl.hpp",
+         # RewriteRule
+         "rule.hpp"
+         ],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "api_tests",
+    srcs = ["lantr_unittest.cpp"],
+)
+
+cc_test(
+    name = "api_test",
+    srcs = [
+         ":api",
+         ":api_tests"
+         ],
+    copts = ["-Isrc"],
+    deps = [
+         "@com_google_googletest//:gtest_main",
+         "@rapidcheck//:rapidcheck",
+         "//src/base:base"
+         ]
+)

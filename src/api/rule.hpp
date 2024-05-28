@@ -23,7 +23,7 @@ public:
   RewriteRule(std::initializer_list<std::string> args) {
     ASSERT(args.size() > num_of_maximum_components ||
            args.size() < num_of_minimum_components,
-           "Rewrite rule consist of at most of three components"
+           "Rewrite rule consist of at most of three components "
            "or at least two components.");
 
     auto iter = args.begin();

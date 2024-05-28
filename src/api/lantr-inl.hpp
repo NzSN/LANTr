@@ -2,7 +2,7 @@
 #define LANTR_API_LANTR_IMPL_H
 
 #include "lantr.hpp"
-#include "base/utility.hpp"
+#include "base/utilities/bottom.hpp"
 
 namespace LANTr::Api {
 
