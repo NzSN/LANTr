@@ -1,0 +1,7 @@
+cc_library(
+    name = "deps",
+    deps = ["@antlr4_runtime//:antlr4_runtime",
+            "@com_google_googletest//:gtest_main",
+            "@rapidcheck//:rapidcheck",
+    ]
+)
