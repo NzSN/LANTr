@@ -1,0 +1,8 @@
+cc_library(
+    name = "parser",
+    srcs = ["//src/parser/ast:ast",
+            "//src/parser/third_parser/typescript:typescript_parser"],
+    visibility = ["//visibility:public"],
+    deps = ["@antlr4_runtime//:antlr4_runtime",
+            "//src/base:base"]
+)

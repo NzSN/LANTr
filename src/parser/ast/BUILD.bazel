@@ -1,4 +1,21 @@
 filegroup(
     name = "ast",
-    srcs = ["parser_tree.hpp"],
+    srcs = ["parsetree.hpp",
+            "parsetree-inl.hpp",
+            "antlr_parsetree.hpp",
+            "antlr_parsetree.cpp",
+            ],
+    visibility = ["//visibility:public"]
+)
+
+cc_test(
+    name = "ast_unittest",
+    srcs = [":ast",
+            "antlr_parsetree_unittest.cpp",
+            "parsetree_unittest.cpp"],
+    deps = ["@antlr4_runtime//:antlr4_runtime",
+            "@com_google_googletest//:gtest_main",
+            "@rapidcheck//:rapidcheck",
+            "//src/base:base"
+            ]
 )
