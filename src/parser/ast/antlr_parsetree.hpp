@@ -9,25 +9,20 @@ namespace LANTr::Parser::AST {
 
 using InternalTree = antlr4::tree::ParseTree;
 
-class AntlrTree: public Base::Tree<AntlrTree> {
+class AntlrTree: public Base::TreeLayer<AntlrTree, InternalTree> {
 public:
-  AntlrTree(InternalTree* tree): node_(tree) {
-    ASSERT(node_, "AntlrTree is initialized from nullptr");
-  }
-  static std::unique_ptr<AntlrTree> BuildFrom(InternalTree* tree);
+  AntlrTree(InternalTree* tree): TreeLayer(tree) {}
 
   std::string Text() const {
-    return node_->getText();
+    return lower_->getText();
   }
 
 private:
   friend struct AstTest;
 
   const InternalTree* GetInternal() const {
-    return const_cast<const InternalTree*>(node_);
+    return const_cast<const InternalTree*>(lower_);
   }
-
-  InternalTree* node_;
 };
 
 } // LANTr::Parser::AST

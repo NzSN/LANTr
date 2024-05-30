@@ -103,6 +103,51 @@ protected:
   Children children_;
 };
 
+template<typename U, typename L>
+class TreeLayer: public Tree<U> {
+public:
+  TreeLayer(L* lower): lower_(lower) {}
+
+  static std::unique_ptr<U> BuildFrom(L* lower) {
+    ASSERT(lower != nullptr, "BuildFrom nullptr");
+
+    auto root = std::make_unique<U>(lower);
+    for (auto c: lower->children) {
+      root->AddChild(BuildFrom(c));
+    }
+
+    return root;
+
+  }
+
+  bool IsLayerEquivalent() const {
+    if (this->size() != lower_->children.size()) {
+      return false;
+    }
+
+    auto iter = lower_->children.cbegin();
+    for (auto const c: *this) {
+      ASSERT(iter < lower_->children.cend(), "out of range");
+
+      const L* internalower_ = c->lower_;
+      if (internalower_ != *iter) {
+        return false;
+      }
+
+      if (!c->IsLayerEquivalent()) {
+        return false;
+      }
+
+      ++iter;
+    }
+
+    return true;
+  }
+
+protected:
+  struct TreeLayerTester;
+  L* lower_;
+};
 
 } // LANTr::Base
 

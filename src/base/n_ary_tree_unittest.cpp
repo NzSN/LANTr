@@ -5,6 +5,10 @@
 
 namespace LANTr::Base {
 
+
+///////////////////////////////////////////////////////////////////////////////
+//                                    Tree                                   //
+///////////////////////////////////////////////////////////////////////////////
 struct Node: public Tree<Node> {
   Node(int num): nNum(num) {}
 
@@ -37,5 +41,20 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//                                 TreeLayer                                 //
+///////////////////////////////////////////////////////////////////////////////
+struct Lower {};
+
+struct Upper {
+  std::unique_ptr<Lower> lower;
+};
+
+struct TreeLayerTester: public ::testing::Test {
+
+};
+RC_GTEST_PROP(TreeLayerTest, LayerConsistentcy, ()) {
+
+}
 
 } // LANTr::Base
