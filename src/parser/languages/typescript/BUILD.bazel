@@ -1,0 +1,15 @@
+filegroup(
+    name = "typescript_hdrs",
+    srcs = ["TypeScriptLexer.h",
+            "TypeScriptLexerBase.h",
+            "TypeScriptParser.h",
+            "TypeScriptParserBase.h",
+            "TypeScriptParserBaseListener.h",
+            "TypeScriptParserListener.h"],
+    visibility = ["//visibility:public"],
+)
+filegroup(
+    name = "typescript_parser",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)

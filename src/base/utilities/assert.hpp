@@ -1,5 +1,5 @@
-#ifndef LANTR_BASE_UTILITY_ASSERT
-#define LANTR_BASE_UTILITY_ASSERT
+#ifndef LANTR_BASE_UTILITY_ASSERT_H_
+#define LANTR_BASE_UTILITY_ASSERT_H_
 
 #include <iostream>
 
@@ -20,4 +20,4 @@
 #endif // NDEBUG
 
 
-#endif // LANTR_BASE_UTILITY_ASSERT
+#endif // LANTR_BASE_UTILITY_ASSERT_H_

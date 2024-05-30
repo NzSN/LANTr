@@ -2,7 +2,7 @@
 #include <rapidcheck/gtest.h>
 
 #include "base/types.hpp"
-#include "lantr-inl.hpp"
+#include "lantr.hpp"
 
 namespace LANTr::Api {
 
