@@ -1,5 +1,5 @@
-#ifndef LANTR_BASE_UTILITY_BOTTOM
-#define LANTR_BASE_UTILITY_BOTTOM
+#ifndef LANTR_BASE_UTILITY_BOTTOM_H_
+#define LANTR_BASE_UTILITY_BOTTOM_H_
 
 #include <utility>
 #include <exception>
@@ -46,4 +46,4 @@ void Unreachable(Reason reason) {
 } // Base
 } // LANTr
 
-#endif /* LANTR_BASE_UTILITY_BOTTOM */
+#endif // LANTR_BASE_UTILITY_BOTTOM_H_

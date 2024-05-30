@@ -3,7 +3,6 @@ filegroup(
     srcs = [
          # LANTr
          "lantr.hpp",
-         "lantr-inl.hpp",
          # RewriteRule
          "rule.hpp"
          ],

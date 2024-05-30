@@ -7,8 +7,20 @@ filegroup(
 
 filegroup(
     name = "types",
-    srcs = ["types.hpp"],
+    srcs = ["types.hpp",
+            "n_ary_tree.hpp"],
     visibility = ["//visibility:public"]
+)
+
+cc_test(
+    name = "base_unittest",
+    srcs = [":types",
+            ":utilities",
+            ":n_ary_tree_unittest.cpp"],
+    deps = ["@antlr4_runtime//:antlr4_runtime",
+            "@com_google_googletest//:gtest_main",
+            "@rapidcheck//:rapidcheck",
+            ]
 )
 
 cc_library(

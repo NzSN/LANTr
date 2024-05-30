@@ -1,5 +1,0 @@
-filegroup(
-    name = "typescript_parser",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)

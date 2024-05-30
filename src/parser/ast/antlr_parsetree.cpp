@@ -3,24 +3,16 @@
 
 #include <memory>
 #include "base/utilities/assert.hpp"
-#include "src/parser/ast/antlr_parsetree.hpp"
+#include "antlr_parsetree.hpp"
 
 namespace LANTr::Parser::AST {
-
-using AntlrInternal = antlr4::tree::ParseTree;
 
 std::unique_ptr<AntlrTree> AntlrTree::BuildFrom(InternalTree* tree) {
   ASSERT(tree != nullptr, "BuildFrom nullptr");
 
   auto root = std::make_unique<AntlrTree>(tree);
-  root->children_ = Children(tree->children.size());
-
-  if (!root->children_.empty()) {
-    std::transform(tree->children.begin(), tree->children.end(),
-                   root->children_.begin(),
-                   [this](AntlrInternal* tree) {
-                     return BuildFrom(tree);
-                   });
+  for (auto c: tree->children) {
+    root->AddChild(BuildFrom(c));
   }
 
   return root;

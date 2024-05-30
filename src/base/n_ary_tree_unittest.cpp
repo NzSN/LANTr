@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
-#include "parsetree-inl.hpp"
+#include "n_ary_tree.hpp"
 
-namespace LANTr::Parser::AST {
+namespace LANTr::Base {
 
-struct Node: public ParseTree<Node> {
+struct Node: public Tree<Node> {
   Node(int num): nNum(num) {}
 
   void AddChildren(std::vector<int> nums) {
@@ -38,4 +38,4 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
 }
 
 
-} // LANTr::Parser::AST
+} // LANTr::Base

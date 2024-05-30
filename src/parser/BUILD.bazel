@@ -1,7 +1,13 @@
 cc_library(
     name = "parser",
     srcs = ["//src/parser/ast:ast",
-            "//src/parser/third_parser/typescript:typescript_parser"],
+            "//src/parser/languages/typescript:typescript_parser",
+            "//src/parser/languages/javascript:javascript_parser",
+            ],
+    hdrs = ["//src/parser/ast:ast_hdrs",
+            "//src/parser/languages/typescript:typescript_hdrs",
+            "//src/parser/languages/javascript:javascript_hdrs",
+            ],
     visibility = ["//visibility:public"],
     deps = ["@antlr4_runtime//:antlr4_runtime",
             "//src/base:base"]

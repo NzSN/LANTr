@@ -1,5 +1,5 @@
-#ifndef LANTR_API_RULE
-#define LANTR_API_RULE
+#ifndef LANTR_API_RULE_H_
+#define LANTR_API_RULE_H_
 
 #include "base/types.hpp"
 #include "base/utilities/assert.hpp"
@@ -64,4 +64,4 @@ private:
 } // LANTr
 
 
-#endif // LANTR_API_RULE
+#endif // LANTR_API_RULE_H_

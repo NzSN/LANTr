@@ -1,0 +1,17 @@
+filegroup(
+    name = "javascript_hdrs",
+    srcs = ["JavaScriptLexer.h",
+            "JavaScriptLexerBase.h",
+            "JavaScriptParser.h",
+            "JavaScriptParserBase.h",
+            "JavaScriptParserBaseListener.h",
+            "JavaScriptParserBaseVisitor.h",
+            "JavaScriptParserListener.h",
+            "JavaScriptParserVisitor.h"],
+    visibility = ["//visibility:public"],
+)
+filegroup(
+    name = "javascript_parser",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)

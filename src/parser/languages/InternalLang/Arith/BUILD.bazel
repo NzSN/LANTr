@@ -1,0 +1,22 @@
+filegroup(
+    name = "arith_hdrs",
+    srcs = ["ArithLexer.h",
+            "ArithParser.h",
+            "ArithVisitor.h",
+            "ArithListener.h",
+            "ArithBaseVisitor.h",
+            "ArithBaseListener.h"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "arith",
+    srcs = [":arith_hdrs",
+            "ArithLexer.cpp",
+            "ArithParser.cpp",
+            "ArithVisitor.cpp",
+            "ArithListener.cpp",
+            "ArithBaseVisitor.cpp",
+            "ArithBaseListener.cpp"],
+    visibility = ["//visibility:public"]
+)

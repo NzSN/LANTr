@@ -1,0 +1,23 @@
+filegroup(
+    name = "languages_srcs",
+    srcs = ["language.hpp",
+            "language_definitions.hpp",
+            "language_impl_unittest.cpp",
+            "language_impl.hpp",
+            "language_impl.cpp",
+            "//src/parser/languages/javascript:javascript_parser",
+            "//src/parser/languages/typescript:typescript_parser",
+            "//src/parser/languages/InternalLang/Arith:arith"],
+    visibility = ["//visibility:public"]
+)
+
+cc_test(
+    name = "languages_unittest",
+    srcs = [":languages_srcs"],
+    deps = [
+         "@com_google_googletest//:gtest_main",
+         "@rapidcheck//:rapidcheck",
+         "//src/base:base",
+         "@antlr4_runtime//:antlr4_runtime"
+         ]
+)

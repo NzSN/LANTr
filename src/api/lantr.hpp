@@ -1,10 +1,12 @@
-#ifndef LANTR_API_LANTR_H
-#define LANTR_API_LANTR_H
+#ifndef LANTR_API_LANTR_H_
+#define LANTR_API_LANTR_H_
 
 #include <vector>
 
 #include "base/types.hpp"
 #include "rule.hpp"
+
+#include "base/utilities/bottom.hpp"
 
 namespace LANTr::Api {
 
@@ -21,9 +23,13 @@ enum LANG {
 template<LANG lang>
 class LANTr {
 public:
-  LANTr(std::initializer_list<RewriteRule> rules);
+  LANTr(std::initializer_list<RewriteRule> rules):
+    rules_{rules} {}
 
-  Source trans(Source s);
+  Source trans(Source s) {
+    Base::Utility::Bottom::Unreachable(
+      Base::Utility::Bottom::Reason::NOT_IMPLEMENTED);
+  }
 
 private:
   std::vector<RewriteRule> rules_;
@@ -31,4 +37,4 @@ private:
 
 } // LANTr::Api
 
-#endif /* LANTR_API_LANTR_H */
+#endif // LANTR_API_LANTR_H_

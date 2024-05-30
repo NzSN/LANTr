@@ -1,5 +1,5 @@
-#ifndef LANTR_BASE_TYPES
-#define LANTR_BASE_TYPES
+#ifndef LANTR_BASE_TYPES_H_
+#define LANTR_BASE_TYPES_H_
 
 #include <string>
 
@@ -9,4 +9,4 @@ using Source = std::string;
 
 } // LANTr::Base::Types
 
-#endif /* LANTR_BASE_TYPES */
+#endif // LANTR_BASE_TYPES_H_
