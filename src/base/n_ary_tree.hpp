@@ -1,6 +1,7 @@
 #ifndef LANTR_BASE_N_ARY_TREE_H_
 #define LANTR_BASE_N_ARY_TREE_H_
 
+#include <ranges>
 #include <memory>
 #include <vector>
 
@@ -125,20 +126,12 @@ public:
       return false;
     }
 
-    auto iter = lower_->children.cbegin();
-    for (auto const c: *this) {
-      ASSERT(iter < lower_->children.cend(), "out of range");
-
-      const L* internalower_ = c->lower_;
-      if (internalower_ != *iter) {
+    for (auto const [child, lowerChild]: std::views::zip(
+           this->children_, lower_->children)) {
+      if (child->lower_ != lowerChild ||
+          !child->IsLayerEquivalent()) {
         return false;
       }
-
-      if (!c->IsLayerEquivalent()) {
-        return false;
-      }
-
-      ++iter;
     }
 
     return true;
