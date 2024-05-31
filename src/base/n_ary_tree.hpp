@@ -127,7 +127,7 @@ public:
     }
 
     auto zipChild = std::views::zip(this->children_, lower_->children);
-    for (auto const [child, lowerChild]: zipChild) {
+    for (auto [child, lowerChild]: zipChild) {
       if (child->lower_ != lowerChild ||
           !child->IsLayerEquivalent()) {
         return false;
