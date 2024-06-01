@@ -1,2 +1,2 @@
 #!/bin/bash
-bazel test $(bazel query //...) -c dbg --build_tests_only
+bazel test $(bazel query //...) -c dbg --config=debug --build_tests_only
