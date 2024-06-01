@@ -3,4 +3,13 @@ build --cxxopt=-Isrc
 build --cxxopt=-std=c++2b
 build --noincompatible_sandbox_hermetic_tmp
 build --registry=https://raw.githubusercontent.com/NzSN/bazel-central-registry/main/
+
+build:debug --strip=never
+build:debug --copt -fsanitize=address
+build:debug --copt -DADDRESS_SANITIZER
+build:debug --copt -O1
+build:debug --copt -g
+build:debug --copt -fno-omit-frame-pointer
+build:debug --linkopt -fsanitize=address
+
 common --enable_bzlmod
