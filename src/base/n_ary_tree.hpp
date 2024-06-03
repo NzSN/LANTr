@@ -18,10 +18,7 @@ public:
   class iterator {
   public:
     iterator(T* root, Children::iterator iter):
-      root_{root}, iter_(iter), isChildrenPart_{false} {
-
-      Utility::Bottom::Unreachable(Utility::Bottom::NOT_IMPLEMENTED);
-    }
+      root_{root}, iter_(iter), isChildrenPart_{false} {}
 
     iterator& operator++() {
       if (!isChildrenPart_) {

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 #include <variant>
+#include <algorithm>
 
 #include "n_ary_tree.hpp"
 #include "tree_layer.hpp"

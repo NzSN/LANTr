@@ -11,7 +11,7 @@
 namespace LANTr::Base::TreeConcepts {
 
 template<typename T>
-concept AntlrTree = requires(T t) {
+concept AntlrTree = requires(T& t) {
   { t.parent } -> std::convertible_to<T*>;
   { t.children } -> std::ranges::range;
 };

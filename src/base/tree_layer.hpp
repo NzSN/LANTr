@@ -4,6 +4,8 @@
 #include "base/n_ary_tree.hpp"
 #include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
+#include "base/utilities/bottom.hpp"
+#include <queue>
 
 namespace LANTr::Base {
 
@@ -44,11 +46,80 @@ public:
   }
 
   void Synchronize() {
+    Utility::Bottom::Unreachable(Utility::Bottom::NOT_IMPLEMENTED);
 
+    // Update InvalidateState for all SubNodes
+    // UpdateInvalidateState(this);
+
+    // Rebuild tree from those Invalidated nodes
+    // RebuildAllInvalidateNodes(this);
+  }
+
+private:
+  enum InvalidateState {
+    VALID,
+    PARTIAL_VALID,
+    INVALID,
+  };
+
+  InvalidateState state_ = VALID;
+  std::queue<TreeLayer*> work_list_;
+
+  void RebuildAllInvalidateNodes(TreeLayer* node) {
+    ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
+  }
+
+  InvalidateState InvalidNodeShallowCheck(TreeLayer* node) {
+    if (node->size() !=
+        TreeConcepts::GetChildren(node->lower_).size()) {
+      return PARTIAL_VALID;
+    }
+    auto zipChild = std::views::zip(
+      node->children_,
+      TreeConcepts::GetChildren(node->lower_));
+    for (auto [child, lowerChild]: zipChild) {
+      if (child->lower_ != TreeConcepts::GetRawPtr(lowerChild)) {
+        child->state_ = INVALID;
+        return PARTIAL_VALID;
+      }
+    }
+
+    return VALID;
+  }
+
+  void UpdateInvalidateStateStep(TreeLayer* current) {
+    current->state_ = InvalidNodeShallowCheck(current);
+
+    // All subnodes of an invalidated node will be rebuilded so
+    // further processing of child node is no needed.
+    if (current->state_ == INVALID) {
+      return;
+    }
+    for (auto& child: current->GetChildren()) {
+      work_list_.push(child.get());
+    }
+  }
+
+  void DoUpdateInvalidateState() {
+    while (!work_list_.empty()) {
+      TreeLayer* current = work_list_.front();
+      UpdateInvalidateStateStep(current);
+      work_list_.pop();
+    }
+  }
+
+  void UpdateInvalidateState(TreeLayer* node) {
+    ASSERT(work_list_.empty(),
+           "Work list should be empty at initial of invalidate");
+
+    // Use the node pointed by argument as root node
+    // to process invalidate.
+    work_list_.push(node);
+    return DoUpdateInvalidateState();
   }
 
 protected:
-  struct TreeLayerTester;
+  friend struct TreeLayerTester;
   L* lower_;
 };
 

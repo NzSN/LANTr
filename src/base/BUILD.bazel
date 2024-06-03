@@ -19,7 +19,7 @@ cc_test(
     name = "base_unittest",
     srcs = [":types",
             ":utilities",
-            ":n_ary_tree_unittest.cpp"],
+            ":tree_unittest.cpp"],
     deps = ["@antlr4_runtime//:antlr4_runtime",
             "@com_google_googletest//:gtest_main",
             "@rapidcheck//:rapidcheck",
