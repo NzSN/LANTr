@@ -82,7 +82,7 @@ private:
   }
 
   void UpdateInvalidateStateStep(TreeLayer* current) {
-    current->state_ = invalidNodeShallowCheck(current) ?
+    current->state_ = InvalidNodeShallowCheck(current) ?
       INVALIDATED : ACTIVE;
 
     // All subnodes of an invalidated node will be rebuilded so
@@ -105,7 +105,7 @@ private:
   }
 
   void UpdateInvalidateState(TreeLayer* node) {
-    work_list_.push_back(node);
+    work_list_.push(node);
     return DoUpdateInvalidateState();
   }
 
