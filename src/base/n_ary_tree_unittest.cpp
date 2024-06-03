@@ -86,7 +86,8 @@ struct TreeLayerTester: public ::testing::Test {
       bool inconsistencyPoint = *rc::gen::arbitrary<bool>();
 
       if (inconsistencyPoint ||
-          (!hasInconsistencyPoint)) {
+          (!hasInconsistencyPoint &&
+           !c->HasChild())) {
         hasInconsistencyPoint = true;
         continue;
       } else {
