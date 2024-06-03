@@ -1,9 +1,11 @@
 #ifndef LANTR_BASE_N_ARY_TREE_H_
 #define LANTR_BASE_N_ARY_TREE_H_
 
-#include <ranges>
 #include <memory>
 #include <vector>
+
+#include "base/utilities/bottom.hpp"
+
 
 namespace LANTr::Base {
 
@@ -15,11 +17,18 @@ public:
   // Iterator
   class iterator {
   public:
-    iterator(Children::iterator iter):
-      iter_(iter) {}
+    iterator(T* root, Children::iterator iter):
+      root_{root}, iter_(iter), isChildrenPart_{false} {
+
+      Utility::Bottom::Unreachable(Utility::Bottom::NOT_IMPLEMENTED);
+    }
 
     iterator& operator++() {
-      ++iter_;
+      if (!isChildrenPart_) {
+        isChildrenPart_ = true;
+      } else {
+        ++iter_;
+      }
       return *this;
     }
 
@@ -36,19 +45,30 @@ public:
     }
 
     T* operator*() {
-      return iter_->get();
+      if (!isChildrenPart_) {
+        return root_;
+      } else {
+        return iter_->get();
+      }
+
     }
   private:
+    bool isChildrenPart_;
+    T* root_;
     Children::iterator iter_;
   };
 
   class const_iterator {
   public:
-    explicit const_iterator(Children::const_iterator iter):
-      iter_{iter} {}
+    explicit const_iterator(T* root, Children::const_iterator iter):
+      root_{root}, iter_{iter}, isChildrenPart_{false} {}
 
     const_iterator& operator++() {
-      ++iter_;
+      if (!isChildrenPart_) {
+        isChildrenPart_ = true;
+      } else {
+        ++iter_;
+      }
       return *this;
     }
 
@@ -61,26 +81,32 @@ public:
     }
 
     const T* operator*() const {
-      return iter_->get();
+      if (!isChildrenPart_) {
+        return root_;
+      } else {
+        return iter_->get();
+      }
     }
   private:
+    bool isChildrenPart_;
+    T* root_;
     Children::const_iterator iter_;
   };
 
   auto begin() {
-    return iterator(children_.begin());
+    return iterator(current_, children_.begin());
   }
 
   auto end() {
-    return iterator(children_.end());
+    return iterator(current_, children_.end());
   }
 
   auto begin() const {
-    return const_iterator(children_.cbegin());
+    return const_iterator(current_, children_.cbegin());
   }
 
   auto end() const {
-    return const_iterator(children_.cend());
+    return const_iterator(current_, children_.cend());
   }
 
   const T* Parent() const {
@@ -92,58 +118,32 @@ public:
   }
 
   void AddChild(std::unique_ptr<T> child) {
+    child->SetParent(current_);
     children_.push_back(std::move(child));
+  }
+
+  [[nodiscard]] bool HasChild() const {
+    return children_.size() > 0;
+  }
+
+  [[nodiscard]] const Children& GetChildren() const {
+    return children_;
+  }
+
+  [[nodiscard]] Children& GetChildren() {
+    return children_;
   }
 
   size_t size() const {
     return children_.size();
   }
 
+  Tree(T* current): current_(current) {}
+
 protected:
   T* parent_;
+  T* current_;
   Children children_;
-};
-
-template<typename U, typename L>
-class TreeLayer: public Tree<U> {
-public:
-  TreeLayer(L* lower): lower_(lower) {}
-
-  static std::unique_ptr<U> BuildFrom(L* lower) {
-    ASSERT(lower != nullptr, "BuildFrom nullptr");
-
-    auto root = std::make_unique<U>(lower);
-    for (auto c: lower->children) {
-      root->AddChild(BuildFrom(c));
-    }
-
-    return root;
-
-  }
-
-  bool IsLayerEquivalent() const {
-    if (this->size() != lower_->children.size()) {
-      return false;
-    }
-
-    auto zipChild = std::views::zip(this->children_, lower_->children);
-    for (auto [child, lowerChild]: zipChild) {
-      if (child->lower_ != lowerChild ||
-          !child->IsLayerEquivalent()) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  void Synchronize() {
-
-  }
-
-protected:
-  struct TreeLayerTester;
-  L* lower_;
 };
 
 } // LANTr::Base

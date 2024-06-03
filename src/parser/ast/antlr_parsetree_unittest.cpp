@@ -22,7 +22,7 @@ bool equivalent(LANGUAGE::TreeType<LANGUAGE::ANTLR4>::type* ltree,
   }
 
   auto iter = ltree->children.cbegin();
-  for (auto const c: *rtree) {
+  for (auto const& c: rtree->GetChildren()) {
     ASSERT(iter < ltree->children.cend(), "out of range");
 
     const InternalTree* internalTree = c->GetInternal();
@@ -30,7 +30,7 @@ bool equivalent(LANGUAGE::TreeType<LANGUAGE::ANTLR4>::type* ltree,
       return false;
     }
 
-    if (!equivalent(*iter, c)) {
+    if (!equivalent(*iter, c.get())) {
       return false;
     }
 

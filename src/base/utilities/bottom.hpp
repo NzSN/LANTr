@@ -1,7 +1,6 @@
 #ifndef LANTR_BASE_UTILITY_BOTTOM_H_
 #define LANTR_BASE_UTILITY_BOTTOM_H_
 
-#include <utility>
 #include <exception>
 
 namespace LANTr {
@@ -9,7 +8,7 @@ namespace Base {
 namespace Utility {
 namespace Bottom {
 
-#include "assert.hpp"
+//#include "base/utilities/assert.hpp"
 
 enum Reason {
   FIRST_REASON = 0,
@@ -25,6 +24,8 @@ struct ReachBottom: public std::exception {
     switch (reason_) {
     case Reason::NOT_IMPLEMENTED:
       return "Not implemented yet";
+    default:
+      return "Unknown reason";
     }
   }
 private:
@@ -33,13 +34,7 @@ private:
 
 }
 
-void Unreachable(Reason reason) {
-  ASSERT(reason >= Reason::FIRST_REASON &&
-         reason < Reason::END_OF_REASON,
-         "Not recognized reason");
-
-  throw ReachBottom(reason);
-}
+void Unreachable(Reason reason);
 
 } // Bottom
 } // Utility

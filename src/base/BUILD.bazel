@@ -1,14 +1,17 @@
 filegroup(
     name = "utilities",
     srcs = ["utilities/assert.hpp",
-            "utilities/bottom.hpp"],
+            "utilities/bottom.hpp",
+            "utilities/bottom.cpp"],
     visibility = ["//visibility:public"]
 )
 
 filegroup(
     name = "types",
     srcs = ["types.hpp",
-            "n_ary_tree.hpp"],
+            "n_ary_tree.hpp",
+            "tree_layer.hpp",
+            "tree_concepts.hpp"],
     visibility = ["//visibility:public"]
 )
 
@@ -25,6 +28,7 @@ cc_test(
 
 cc_library(
     name = "base",
+    srcs = [":utilities"],
     hdrs = [":types",
             ":utilities"],
     include_prefix = "base",

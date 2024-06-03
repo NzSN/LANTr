@@ -2,8 +2,7 @@
 #define LANTR_PARSER_AST_ANTLRPARSETREE_H_
 
 #include "antlr4-runtime.h"
-#include "base/utilities/assert.hpp"
-#include "base/n_ary_tree.hpp"
+#include "base/tree_layer.hpp"
 
 namespace LANTr::Parser::AST {
 
@@ -11,7 +10,7 @@ using InternalTree = antlr4::tree::ParseTree;
 
 class AntlrTree: public Base::TreeLayer<AntlrTree, InternalTree> {
 public:
-  AntlrTree(InternalTree* tree): TreeLayer(tree) {}
+  AntlrTree(InternalTree* tree): TreeLayer(this, tree) {}
 
   std::string Text() const {
     return lower_->getText();
