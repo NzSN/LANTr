@@ -14,7 +14,9 @@ requires std::derived_from<L, Tree<L>> ||
          TreeConcepts::AntlrTree<L>
 class TreeLayer: public Tree<U> {
 public:
-  TreeLayer(U* upper, L* lower): Tree<U>(upper), lower_(lower) {}
+  TreeLayer(U* upper, L* lower): Tree<U>(upper), lower_(lower) {
+    static_assert(std::derived_from<U, TreeLayer<U,L>>);
+  }
 
   static std::unique_ptr<U> BuildFrom(L* lower) {
     ASSERT(lower != nullptr, "BuildFrom nullptr");
@@ -91,6 +93,9 @@ private:
     current->state_ = Stepping(current);
 
     for (auto& child: current->GetChildren()) {
+      if (child->state_ == INVALID) {
+        continue;
+      }
       work_list_.push(child.get());
     }
   }
@@ -101,6 +106,9 @@ private:
       UpdateInvalidateStateStep(current);
       work_list_.pop();
     }
+
+    ASSERT(work_list_.empty(),
+           "Work list should be empty at end of invalidate algorithm");
   }
 
   void UpdateInvalidateState(TreeLayer* node) {
