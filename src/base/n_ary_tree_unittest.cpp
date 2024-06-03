@@ -12,7 +12,7 @@ namespace LANTr::Base {
 //                                    Tree                                   //
 ///////////////////////////////////////////////////////////////////////////////
 struct Node: public Tree<Node> {
-  Node(int num): nNum(num) {}
+  Node(int num): Tree<Node>{this}, nNum(num) {}
 
   void AddChildren(std::vector<int> nums) {
     std::for_each(nums.begin(), nums.end(),
@@ -46,11 +46,13 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
 ///////////////////////////////////////////////////////////////////////////////
 //                                 TreeLayer                                 //
 ///////////////////////////////////////////////////////////////////////////////
-struct Lower: public Tree<Lower> {};
+struct Lower: public Tree<Lower> {
+  Lower(): Tree<Lower>(this) {}
+};
 
 struct Upper: public TreeLayer<Upper,Lower> {
-  Upper(): TreeLayer{nullptr} {}
-  Upper(Lower* lower): TreeLayer{lower} {}
+  Upper(): TreeLayer{this, nullptr} {}
+  Upper(Lower* lower): TreeLayer{this, lower} {}
 };
 
 using Layers = std::variant<Upper, Lower>;
@@ -100,45 +102,35 @@ struct TreeLayerTester: public ::testing::Test {
   }
 
   template<bool IsConsistency>
-  std::vector<std::unique_ptr<Upper>>
-  GetLayers(int numOfLayers) {
-    std::vector<std::unique_ptr<Upper>> layers;
+  std::unique_ptr<Upper>
+  GetLayers() {
+    // Generate lower layer
+    int numOfNodes = 100;
+    std::unique_ptr<Lower> lowerLayer = GenLowerLayer(numOfNodes);
 
-    while (numOfLayers > 0) {
-      // Generate lower layer
-      int numOfNodes = 100;
-      std::unique_ptr<Lower> lowerLayer = GenLowerLayer(numOfNodes);
+    // Generate consistency upper layer
+    std::unique_ptr<Upper> upperLayer =
+      IsConsistency ? GenConsistencyUpper(lowerLayer.get())
+                    : GenInconsistencyUpper(lowerLayer.get());
 
-      // Generate consistency upper layer
-      std::unique_ptr<Upper> upperLayer =
-        IsConsistency ? GenConsistencyUpper(lowerLayer.get())
-                      : GenInconsistencyUpper(lowerLayer.get());
+    lowers.push_back(std::move(lowerLayer));
 
-      layers.push_back(std::move(upperLayer));
-      lowers.push_back(std::move(lowerLayer));
-
-      --numOfLayers;
-    }
-
-    return layers;
+    return upperLayer;
   }
 
   std::vector<std::unique_ptr<Lower>> lowers;
 };
 
 RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerConsistentcy, ()) {
-  constexpr int numOfLayers = 100;
-  for (auto& layer: GetLayers<true>(numOfLayers)) {
-    RC_ASSERT(layer->IsLayerEquivalent());
-  }
-
-  for (auto& layer: GetLayers<false>(numOfLayers)) {
-    RC_ASSERT(!layer->IsLayerEquivalent());
-  }
+  RC_ASSERT(GetLayers<true>()->IsLayerEquivalent());
+  RC_ASSERT(!GetLayers<false>()->IsLayerEquivalent());
 }
 
 RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
-
+  auto layer = GetLayers<false>();
+  RC_ASSERT(!layer->IsLayerEquivalent());
+  layer->Synchronize();
+  RC_ASSERT(layer->IsLayerEquivalent());
 }
 
 } // LANTr::Base

@@ -118,6 +118,7 @@ public:
   }
 
   void AddChild(std::unique_ptr<T> child) {
+    child->SetParent(current_);
     children_.push_back(std::move(child));
   }
 
@@ -136,6 +137,8 @@ public:
   size_t size() const {
     return children_.size();
   }
+
+  Tree(T* current): current_(current) {}
 
 protected:
   T* parent_;

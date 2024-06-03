@@ -12,7 +12,7 @@ requires std::derived_from<L, Tree<L>> ||
          TreeConcepts::AntlrTree<L>
 class TreeLayer: public Tree<U> {
 public:
-  TreeLayer(L* lower): lower_(lower) {}
+  TreeLayer(U* upper, L* lower): Tree<U>(upper), lower_(lower) {}
 
   static std::unique_ptr<U> BuildFrom(L* lower) {
     ASSERT(lower != nullptr, "BuildFrom nullptr");

@@ -10,7 +10,7 @@ using InternalTree = antlr4::tree::ParseTree;
 
 class AntlrTree: public Base::TreeLayer<AntlrTree, InternalTree> {
 public:
-  AntlrTree(InternalTree* tree): TreeLayer(tree) {}
+  AntlrTree(InternalTree* tree): TreeLayer(this, tree) {}
 
   std::string Text() const {
     return lower_->getText();
