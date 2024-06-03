@@ -69,7 +69,7 @@ private:
     ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
   }
 
-  InvalidateState InvalidNodeShallowCheck(TreeLayer* node) {
+  InvalidateState Stepping(TreeLayer* node) {
     if (node->size() !=
         TreeConcepts::GetChildren(node->lower_).size()) {
       return PARTIAL_VALID;
@@ -88,13 +88,8 @@ private:
   }
 
   void UpdateInvalidateStateStep(TreeLayer* current) {
-    current->state_ = InvalidNodeShallowCheck(current);
+    current->state_ = Stepping(current);
 
-    // All subnodes of an invalidated node will be rebuilded so
-    // further processing of child node is no needed.
-    if (current->state_ == INVALID) {
-      return;
-    }
     for (auto& child: current->GetChildren()) {
       work_list_.push(child.get());
     }
