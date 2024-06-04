@@ -1,7 +1,7 @@
 #ifndef LANTR_BASE_N_ARY_TREE_H_
 #define LANTR_BASE_N_ARY_TREE_H_
 
-#include <__concepts/derived_from.h>
+#include <concepts>
 #include <memory>
 #include <vector>
 
