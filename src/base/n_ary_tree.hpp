@@ -1,6 +1,7 @@
 #ifndef LANTR_BASE_N_ARY_TREE_H_
 #define LANTR_BASE_N_ARY_TREE_H_
 
+#include <concepts>
 #include <memory>
 #include <vector>
 
@@ -14,23 +15,48 @@ class Tree {
 public:
   using Children = std::vector<std::unique_ptr<T>>;
 
-  // Iterator
+  // Iterate over a Tree in Pre-Order.
   class iterator {
   public:
-    iterator(T* root, Children::iterator iter):
-      root_{root}, iter_(iter), isChildrenPart_{false} {}
+    iterator(T* node, bool isEnd = false):
+      node_{node}, isEnd_{isEnd} {
+      ASSERT(node_ != nullptr,
+             "Iterate over a memory area pointed by nullptr");
+    }
 
+    // Pre-Order Traversal.
     iterator& operator++() {
-      if (!isChildrenPart_) {
-        isChildrenPart_ = true;
-      } else {
-        ++iter_;
+      if (isEnd_) {
+        return *this;
       }
+
+      Tree<T*> treeNode = static_cast<Tree<T>*>(node_);
+
+      if (!treeNode.children_.empty()) {
+        // The node will be the next to be accessed.
+        node_ = treeNode.children_.front();
+
+        // Push right side of childs into stack in reverse order.
+        auto begin = treeNode.children_.rbegin();
+        auto end   = treeNode.children_.rend() - 1;
+        for (typename Children::reverse_iterator iter = begin;
+            iter != end; ++iter) {
+          accesses_.push_back(std::addressof(*iter));
+        }
+      } else if (!accesses_.empty()) {
+        node_ = accesses_.back();
+        accesses_.pop_back();
+      } else {
+        isEnd_ = true;
+      }
+
       return *this;
     }
 
     iterator operator++(int) {
-      return iterator(iter_++);
+      auto iter = *this;
+      this->operator++();
+      return iter;
     }
 
     bool operator==(iterator& other) {
@@ -42,68 +68,33 @@ public:
     }
 
     T* operator*() {
-      if (!isChildrenPart_) {
-        return root_;
-      } else {
-        return iter_->get();
-      }
-
-    }
-  private:
-    bool isChildrenPart_;
-    T* root_;
-    Children::iterator iter_;
-  };
-
-  class const_iterator {
-  public:
-    explicit const_iterator(T* root, Children::const_iterator iter):
-      root_{root}, iter_{iter}, isChildrenPart_{false} {}
-
-    const_iterator& operator++() {
-      if (!isChildrenPart_) {
-        isChildrenPart_ = true;
-      } else {
-        ++iter_;
-      }
-      return *this;
-    }
-
-    bool operator==(const_iterator& other) {
-      return this->iter_ == other.iter_;
-    }
-
-    bool operator!=(const_iterator& other) {
-      return this->iter_ != other.iter_;
+      return node_;
     }
 
     const T* operator*() const {
-      if (!isChildrenPart_) {
-        return root_;
-      } else {
-        return iter_->get();
-      }
+      return node_;
     }
+
   private:
-    bool isChildrenPart_;
-    T* root_;
-    Children::const_iterator iter_;
+    bool isEnd_;
+    T* node_;
+    std::vector<T*> accesses_;
   };
 
   auto begin() {
-    return iterator(current_, children_.begin());
+    return iterator(current_);
   }
 
   auto end() {
-    return iterator(current_, children_.end());
+    return iterator(current_, true);
   }
 
   auto begin() const {
-    return const_iterator(current_, children_.cbegin());
+    return iterator(current_, children_.cbegin());
   }
 
   auto end() const {
-    return const_iterator(current_, children_.cend());
+    return iterator(current_, children_.cend());
   }
 
   const T* Parent() const {
@@ -135,7 +126,9 @@ public:
     return children_.size();
   }
 
-  Tree(T* current): current_(current) {}
+  Tree(T* current): current_(current) {
+    static_assert(std::derived_from<T, Tree<T>>);
+  }
 
 protected:
   T* parent_;

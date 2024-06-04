@@ -59,6 +59,11 @@ struct Upper: public TreeLayer<Upper,Lower> {
 using Layers = std::variant<Upper, Lower>;
 
 struct TreeLayerTester: public ::testing::Test {
+
+  std::vector<Upper*> LetSomeNodesToBeInvalidated(Upper* upper) {
+
+  }
+
   [[nodiscard]] std::unique_ptr<Lower> GenLowerLayer(int numOfNodes) {
     std::unique_ptr<Lower> root = std::make_unique<Lower>();
     --numOfNodes;
@@ -125,6 +130,28 @@ struct TreeLayerTester: public ::testing::Test {
 RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerConsistentcy, ()) {
   RC_ASSERT(GetLayers<true>()->IsLayerEquivalent());
   RC_ASSERT(!GetLayers<false>()->IsLayerEquivalent());
+}
+
+RC_GTEST_FIXTURE_PROP(TreeLayerTester, Invalidate, ()) {
+  auto layer = GetLayers<true>();
+  std::vector<Upper*> invalidatedNodes = LetSomeNodesToBeInvalidated(layer.get());
+
+  RC_ASSERT(!layer->IsLayerEquivalent());
+  layer->CheckInvalidated();
+
+  // Then iterative over the tree to collect all
+  // invalidated nodes.
+  // TODO: Implement iterator over a Tree.
+  std::vector<Upper*> invalidatedFounds;
+
+  // Those nodes been collected should be found in 'invalidatedNodes'
+  std::for_each(invalidatedFounds.begin(),
+                invalidatedFounds.end(),
+                [&](const Upper* node) {
+                  RC_ASSERT(std::find(invalidatedNodes.begin(),
+                            invalidatedNodes.end(), node) !=
+                            invalidatedNodes.end());
+                });
 }
 
 RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
