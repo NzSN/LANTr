@@ -48,13 +48,15 @@ public:
   }
 
   void Synchronize() {
-    Utility::Bottom::Unreachable(Utility::Bottom::NOT_IMPLEMENTED);
-
     // Update InvalidateState for all SubNodes
-    // UpdateInvalidateState(this);
+    UpdateInvalidateState(this);
 
     // Rebuild tree from those Invalidated nodes
-    // RebuildAllInvalidateNodes(this);
+    RebuildAllInvalidateNodes(this);
+  }
+
+  void CheckInvalidated() {
+    UpdateInvalidateState(this);
   }
 
 private:
