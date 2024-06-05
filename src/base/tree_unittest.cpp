@@ -1,8 +1,12 @@
 #include <gtest/gtest.h>
+#include <iterator>
 #include <rapidcheck/gtest.h>
+
+#include <ranges>
 #include <variant>
 #include <algorithm>
 
+#include "base/utilities/bottom.hpp"
 #include "n_ary_tree.hpp"
 #include "tree_layer.hpp"
 
@@ -15,7 +19,7 @@ namespace LANTr::Base {
 struct Node: public Tree<Node> {
   Node(int num): Tree<Node>{this}, nNum(num) {}
 
-  void AddChildren(std::vector<int> nums) {
+  void AddChildren(std::vector<int>& nums) {
     std::for_each(nums.begin(), nums.end(),
                   [this](int num) {
                     auto node = std::make_unique<Node>(num);
@@ -45,7 +49,19 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
 }
 
 RC_GTEST_PROP(NAryTreeTest, Traversal, ()) {
+  Node node(1);
 
+  std::vector<int> nums{1,23,4,5};
+  node.AddChildren(nums);
+  auto iter = node.GetChildren().begin();;
+  (*iter)->AddChildren(nums);
+
+  std::vector<int> expected{1, 1, 1, 23, 4, 5, 23,4,5};
+  auto iter_expected = expected.begin();
+  for (auto iter: node) {
+    RC_ASSERT(*iter_expected == iter->nNum);
+    ++iter_expected;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +81,7 @@ using Layers = std::variant<Upper, Lower>;
 struct TreeLayerTester: public ::testing::Test {
 
   std::vector<Upper*> LetSomeNodesToBeInvalidated(Upper* upper) {
-
+    Utility::Bottom::Unreachable(Utility::Bottom::NOT_IMPLEMENTED);
   }
 
   [[nodiscard]] std::unique_ptr<Lower> GenLowerLayer(int numOfNodes) {

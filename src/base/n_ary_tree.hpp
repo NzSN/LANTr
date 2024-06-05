@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "base/utilities/assert.hpp"
 #include "base/utilities/bottom.hpp"
 
 
@@ -20,7 +21,10 @@ public:
   public:
     iterator(T* node, bool isEnd = false):
       node_{node}, isEnd_{isEnd} {
-      ASSERT(node_ != nullptr,
+
+      node_ = isEnd_ ? nullptr : node_;
+      ASSERT((!isEnd_ && node_ != nullptr) ||
+             (isEnd && node_ == nullptr),
              "Iterate over a memory area pointed by nullptr");
     }
 
@@ -30,24 +34,25 @@ public:
         return *this;
       }
 
-      Tree<T*> treeNode = static_cast<Tree<T>*>(node_);
+      Tree<T>* treeNode = static_cast<Tree<T>*>(node_);
 
-      if (!treeNode.children_.empty()) {
+      if (!treeNode->children_.empty()) {
         // The node will be the next to be accessed.
-        node_ = treeNode.children_.front();
+        node_ = treeNode->children_.front().get();
 
         // Push right side of childs into stack in reverse order.
-        auto begin = treeNode.children_.rbegin();
-        auto end   = treeNode.children_.rend() - 1;
+        auto begin = treeNode->children_.rbegin();
+        auto end   = treeNode->children_.rend() - 1;
         for (typename Children::reverse_iterator iter = begin;
             iter != end; ++iter) {
-          accesses_.push_back(std::addressof(*iter));
+          accesses_.push_back(iter->get());
         }
       } else if (!accesses_.empty()) {
         node_ = accesses_.back();
         accesses_.pop_back();
       } else {
         isEnd_ = true;
+        node_ = nullptr;
       }
 
       return *this;
@@ -59,19 +64,16 @@ public:
       return iter;
     }
 
-    bool operator==(iterator& other) {
-      return this->iter_ == other.iter_;
+    bool operator==(const iterator& other) const {
+      return this->node_ == other.node_ &&
+        this->isEnd_ == other.isEnd_;
     }
 
-    bool operator!=(iterator& other) {
-      return this->iter_ != other.iter_;
+    bool operator!=(const iterator& other) const {
+      return !this->operator==(other);
     }
 
     T* operator*() {
-      return node_;
-    }
-
-    const T* operator*() const {
       return node_;
     }
 
