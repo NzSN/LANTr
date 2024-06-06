@@ -19,8 +19,13 @@ public:
   // Iterate over a Tree in Pre-Order.
   class iterator {
   public:
+
+    using difference_type = std::ptrdiff_t;
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = T;
+
     iterator(T* node, bool isEnd = false):
-      node_{node}, isEnd_{isEnd} {
+     isEnd_{isEnd}, node_{node}  {
 
       node_ = isEnd_ ? nullptr : node_;
       ASSERT((!isEnd_ && node_ != nullptr) ||
@@ -73,8 +78,8 @@ public:
       return !this->operator==(other);
     }
 
-    T* operator*() {
-      return node_;
+    T& operator*() const {
+      return *node_;
     }
 
   private:
@@ -89,14 +94,6 @@ public:
 
   auto end() {
     return iterator(current_, true);
-  }
-
-  auto begin() const {
-    return iterator(current_, children_.cbegin());
-  }
-
-  auto end() const {
-    return iterator(current_, children_.cend());
   }
 
   const T* Parent() const {
