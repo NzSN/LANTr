@@ -49,14 +49,10 @@ public:
 
   void Synchronize() {
     // Update InvalidateState for all SubNodes
-    UpdateInvalidateState(this);
+    UpdateInvalidateState();
 
     // Rebuild tree from those Invalidated nodes
-    RebuildAllInvalidateNodes(this);
-  }
-
-  void CheckInvalidated() {
-    UpdateInvalidateState(this);
+    RebuildAllInvalidateNodes();
   }
 
 private:
@@ -69,26 +65,29 @@ private:
   InvalidateState state_ = VALID;
   std::queue<TreeLayer*> work_list_;
 
-  void RebuildAllInvalidateNodes(TreeLayer* node) {
+  void RebuildAllInvalidateNodes() {
     ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
   }
 
   InvalidateState Stepping(TreeLayer* node) {
+    InvalidateState state = VALID;
+
     if (node->size() !=
         TreeConcepts::GetChildren(node->lower_).size()) {
-      return PARTIAL_VALID;
-    }
-    auto zipChild = std::views::zip(
-      node->children_,
-      TreeConcepts::GetChildren(node->lower_));
-    for (auto [child, lowerChild]: zipChild) {
-      if (child->lower_ != TreeConcepts::GetRawPtr(lowerChild)) {
-        child->state_ = INVALID;
-        return PARTIAL_VALID;
+      state = PARTIAL_VALID;
+    } else {
+      auto zipChild = std::views::zip(
+        node->children_,
+        TreeConcepts::GetChildren(node->lower_));
+      for (auto [child, lowerChild]: zipChild) {
+        if (child->lower_ != TreeConcepts::GetRawPtr(lowerChild)) {
+          child->state_ = INVALID;
+          state = PARTIAL_VALID;
+        }
       }
     }
 
-    return VALID;
+    return state;
   }
 
   void UpdateInvalidateStateStep(TreeLayer* current) {
@@ -113,13 +112,13 @@ private:
            "Work list should be empty at end of invalidate algorithm");
   }
 
-  void UpdateInvalidateState(TreeLayer* node) {
+  void UpdateInvalidateState() {
     ASSERT(work_list_.empty(),
            "Work list should be empty at initial of invalidate");
 
     // Use the node pointed by argument as root node
     // to process invalidate.
-    work_list_.push(node);
+    work_list_.push(this);
     return DoUpdateInvalidateState();
   }
 
