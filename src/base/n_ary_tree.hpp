@@ -104,6 +104,19 @@ public:
     parent_ = parent;
   }
 
+  bool IsDescdentOf(Tree<T>& other) {
+    auto parent = parent_;
+
+    while (parent) {
+      if (parent->current_ == other.current_) {
+        return true;
+      }
+      parent = parent->parent_;
+    }
+
+    return false;
+  }
+
   void AddChild(std::unique_ptr<T> child) {
     child->SetParent(current_);
     children_.push_back(std::move(child));
@@ -125,15 +138,28 @@ public:
     return children_.size();
   }
 
-  Tree(T* current): current_(current) {
+  Tree(T* current):
+    parent_{nullptr}, current_{current} {
+
     static_assert(std::derived_from<T, Tree<T>>);
   }
 
 protected:
   T* parent_;
   T* current_;
+
   Children children_;
 };
+
+template<typename T>
+int32_t GetNumOfNodes(Tree<T>& tree) {
+  int32_t count = 0;
+  for (auto& node: tree) {
+    ++count;
+  }
+
+  return count;
+}
 
 } // LANTr::Base
 
