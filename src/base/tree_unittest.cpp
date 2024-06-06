@@ -277,6 +277,11 @@ struct TreeLayerTester: public ::testing::Test {
     return upper->state_ == TreeLayer<Upper, Lower>::INVALID;
   }
 
+  bool IsPartialNode(Upper* upper) {
+    return upper->state_ == TreeLayer<Upper, Lower>::PARTIAL_VALID;
+  }
+
+
   std::vector<std::unique_ptr<Lower>> lowers;
 };
 
@@ -308,6 +313,9 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, Invalidate, ()) {
   std::for_each(invalidatedFounds.begin(),
                 invalidatedFounds.end(),
                 [&](const Upper* node) {
+                  if (node->Parent() != nullptr) {
+                    RC_ASSERT(IsPartialNode(node->Parent()));
+                  }
                   RC_ASSERT(std::find(invalidatedNodes.begin(),
                             invalidatedNodes.end(), node) !=
                             invalidatedNodes.end());

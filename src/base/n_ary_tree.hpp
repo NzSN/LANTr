@@ -96,7 +96,7 @@ public:
     return iterator(current_, true);
   }
 
-  const T* Parent() const {
+  T* Parent() const {
     return parent_;
   }
 
