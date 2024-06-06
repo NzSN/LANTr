@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
-#include <iterator>
 #include <rapidcheck/gtest.h>
 
-#include <ranges>
 #include <variant>
 #include <algorithm>
 
@@ -42,10 +40,25 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
   }
 
   node.AddChildren(nums);
+
+  //std::make_const_iterator(node.begin());
+
   auto iter = nums.begin();
   for (auto& i: node.GetChildren()) {
     RC_ASSERT(i->nNum == *iter++);
   }
+}
+
+RC_GTEST_PROP(NARYTreeTest, Traversal_Base, ()) {
+  Node node(1);
+
+  int count{};
+  for (auto& iter: node) {
+    RC_ASSERT(iter.nNum == 1);
+    ++count;
+  }
+
+  RC_ASSERT(count == 1);
 }
 
 RC_GTEST_PROP(NAryTreeTest, Traversal, ()) {
@@ -58,8 +71,10 @@ RC_GTEST_PROP(NAryTreeTest, Traversal, ()) {
 
   std::vector<int> expected{1, 1, 1, 23, 4, 5, 23,4,5};
   auto iter_expected = expected.begin();
-  for (auto iter: node) {
-    RC_ASSERT(*iter_expected == iter->nNum);
+  for (auto& iter: node) {
+    RC_ASSERT(iter_expected != expected.end());
+    RC_ASSERT(*iter_expected == iter.nNum);
+
     ++iter_expected;
   }
 }
