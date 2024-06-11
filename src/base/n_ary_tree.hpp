@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 
+#include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
 #include "base/utilities/bottom.hpp"
 
@@ -142,6 +143,7 @@ public:
     parent_{nullptr}, current_{current} {
 
     static_assert(std::derived_from<T, Tree<T>>);
+    static_assert(TreeConcepts::NAryTree<T>);
   }
 
 protected:
@@ -154,7 +156,7 @@ protected:
 template<typename T>
 int32_t GetNumOfNodes(Tree<T>& tree) {
   int32_t count = 0;
-  for (auto& node: tree) {
+  for ([[maybe_unused]] auto& node: tree) {
     ++count;
   }
 

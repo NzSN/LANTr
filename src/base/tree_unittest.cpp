@@ -1,13 +1,15 @@
 #include <gtest/gtest.h>
+#include <optional>
 #include <rapidcheck/gtest.h>
 
 #include <variant>
 #include <algorithm>
 
+#include "base/utilities/assert.hpp"
 #include "test_utility.hpp"
 #include "base/utilities/bottom.hpp"
-#include "n_ary_tree.hpp"
-#include "tree_layer.hpp"
+#include "base/n_ary_tree.hpp"
+#include "base/tree_layer.hpp"
 
 namespace LANTr::Base {
 
@@ -94,45 +96,14 @@ using Layers = std::variant<Upper, Lower>;
 
 struct TreeLayerTester: public ::testing::Test {
 
-  std::tuple<Upper*, Upper*> InvalidateStep(Upper* upper,
-    std::vector<int>& invalidateds) {
-
-    std::tuple<Upper*, Upper*> invalids{nullptr, nullptr};
-    auto& from = std::get<0>(invalids);
-    auto& to   = std::get<1>(invalids);
-
-    ASSERT(from == nullptr && to == nullptr, "invalids is dirty");
-
-    int numOfNodes = GetNumOfNodes(*upper);
-    int nthToSelect_1st = RC::RandomNumUntil(0, numOfNodes,
-                                             [=](int num) -> bool {
-                                               return num !=0 && (num % numOfNodes) != 0;
-                                             });
-    int nthToSelect_2nd = RC::RandomNumUntil(0, numOfNodes,
-                                             [=](int num) -> bool {
-                                               return num != nthToSelect_1st && (num % numOfNodes) != 0;
-                                             });
-
-    if (std::find_if(invalidateds.begin(), invalidateds.end(),
-                 [&](const int selected) {
-                   return nthToSelect_1st == selected ||
-                     nthToSelect_2nd == selected;
-                 }) != invalidateds.end()) {
-      return invalids;
-    }
-
-    invalidateds.push_back(nthToSelect_1st);
-    invalidateds.push_back(nthToSelect_2nd);
+  std::optional<std::tuple<Upper*, Upper*>>
+  SwapLower(Upper* upper, int indexL, int indexR) {
+    Upper* from{};
+    Upper* to{};
 
     int count = 0;
-    while (true) {
-
-      for (auto& node: *upper) {
-
-        if (node.state_ == TreeLayer<Upper, Lower>::VALID &&
-            (count == nthToSelect_1st ||
-             count == nthToSelect_2nd)) {
-
+    for (auto& node: *upper) {
+        if (count == indexL || count == indexR) {
           if (from == nullptr) {
             ASSERT(to == nullptr, "'to' should not be setted before 'from'");
             from = &node;
@@ -140,19 +111,46 @@ struct TreeLayerTester: public ::testing::Test {
             ASSERT(from != nullptr, "'to' should not be setted before 'from'");
             to = &node;
 
-            RC_ASSERT(from->lower_ != to->lower_);
-            // To mistake relation of these two nodes.
             std::swap(from->lower_, to->lower_);
 
-            return invalids;
+            return std::make_tuple(from, to);
           }
         }
-
         ++count;
-      }
-
-      ASSERT(from == nullptr || to == nullptr, "Invariant failure");
     }
+    return std::nullopt;
+  }
+
+  std::optional<std::tuple<Upper*, Upper*>>
+  InvalidateStep(Upper* upper,
+    std::vector<int>& invalidateds) {
+
+    int numOfNodes = GetNumOfNodes(*upper);
+    int nthToSelect_1st = RC::RandomNumUntil(
+      0, numOfNodes,
+      [&](int num) -> bool {
+        return num !=0
+          && (num % numOfNodes) != 0
+          && std::find(invalidateds.begin(),
+                       invalidateds.end(),
+                       num)
+             == invalidateds.end();
+      });
+    int nthToSelect_2nd = RC::RandomNumUntil(
+      0, numOfNodes,
+      [&](int num) -> bool {
+        return num != nthToSelect_1st
+          && (num % numOfNodes) != 0
+          && std::find(invalidateds.begin(),
+                       invalidateds.end(),
+                       num)
+             == invalidateds.end();
+      });
+
+    invalidateds.push_back(nthToSelect_1st);
+    invalidateds.push_back(nthToSelect_2nd);
+
+    return SwapLower(upper, nthToSelect_1st, nthToSelect_2nd);
   }
 
   std::vector<Upper*> LetSomeNodesToBeInvalidated(Upper* upper) {
@@ -163,17 +161,18 @@ struct TreeLayerTester: public ::testing::Test {
       *rc::gen::inRange(0, GetNumOfNodes(*upper)) / 2;
 
     while (numToInvalidate > 0) {
-      std::tuple<Upper*, Upper*> invalids = InvalidateStep(upper, records);
-      RC_ASSERT(std::get<0>(invalids) != std::get<1>(invalids) ||
-                (std::get<0>(invalids) == nullptr &&
-                 std::get<1>(invalids) == nullptr));
-
-      if (std::get<0>(invalids) != nullptr &&
-          std::get<1>(invalids) != nullptr) {
-
-        invalidatedNodes.push_back(std::get<0>(invalids));
-        invalidatedNodes.push_back(std::get<1>(invalids));
+      std::optional<std::tuple<Upper*, Upper*>> invalids_opt =
+        InvalidateStep(upper, records);
+      if (!invalids_opt.has_value()) {
+        continue;
       }
+
+      auto invalids = invalids_opt.value();
+      ASSERT(std::get<0>(invalids) != nullptr &&
+             std::get<1>(invalids) != nullptr,
+             "invalidate a nullptr is impossible");
+      invalidatedNodes.push_back(std::get<0>(invalids));
+      invalidatedNodes.push_back(std::get<1>(invalids));
 
       --numToInvalidate;
     }
@@ -202,7 +201,20 @@ struct TreeLayerTester: public ::testing::Test {
     return processed;
   }
 
-  std::vector<Upper*> PartialSomeNodes(Upper* upper) {}
+  std::vector<Upper*> PartialSomeNodes(Upper* upper) {
+    std::vector<Upper*> partialedNodes{};
+    std::for_each(upper->begin(), upper->end(),
+                  [&](Upper& upper_) {
+                    bool doPartial = *rc::Arbitrary<bool>::arbitrary();
+                    if (doPartial && !upper_.children_.empty()) {
+                      // This operation does not invalidate the
+                      // 'upper' iterator.
+                      upper_.children_.pop_back();
+                      partialedNodes.push_back(&upper_);
+                    }
+                  });
+    return partialedNodes;
+  }
 
   [[nodiscard]] std::unique_ptr<Lower> GenLowerLayer(int numOfNodes) {
     std::unique_ptr<Lower> root = std::make_unique<Lower>();
@@ -294,13 +306,12 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, Invalidate, ()) {
   // Then iterative over the tree to collect all
   // invalidated nodes.
   std::vector<Upper*> invalidatedFounds;
-  int i = 0;
-  for (auto& node: *layer) {
-    if (IsInvalidNode(&node)) {
-      invalidatedFounds.push_back(&node);
-    }
-    ++i;
-  }
+  std::for_each(layer->begin(), layer->end(),
+                [&](auto& node) {
+                  if (IsInvalidNode(&node)) {
+                    invalidatedFounds.push_back(&node);
+                  }
+                });
 
   RC_ASSERT(invalidatedNodes.size() == invalidatedFounds.size());
 
@@ -314,6 +325,25 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, Invalidate, ()) {
                   RC_ASSERT(std::find(invalidatedNodes.begin(),
                             invalidatedNodes.end(), node) !=
                             invalidatedNodes.end());
+                });
+}
+
+RC_GTEST_FIXTURE_PROP(TreeLayerTester, PartialCheck, ()) {
+  auto layer = GetLayers<true>();
+
+  std::vector<Upper*> partials = PartialSomeNodes(layer.get());
+  CheckInvalidated(layer.get());
+
+  std::for_each(partials.begin(), partials.end(),
+                [&](Upper* u) {
+                  RC_ASSERT(IsPartialNode(u));
+                });
+
+  // Due to we don't alter relations except
+  // partial so there must no INVAID state nodes.
+  std::for_each(partials.begin(), partials.end(),
+                [&](Upper* u) {
+                  RC_ASSERT(!IsInvalidNode(u));
                 });
 }
 

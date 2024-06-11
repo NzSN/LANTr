@@ -6,23 +6,34 @@ filegroup(
             "utility.hpp",
             "test_utility.hpp",
             "test_utility.cpp"],
-    visibility = ["//visibility:public"]
+)
+
+filegroup(
+    name = "test_utilities",
+    srcs = ["test_utility.hpp",
+            "test_utility.cpp"]
 )
 
 filegroup(
     name = "types",
     srcs = ["types.hpp",
             "n_ary_tree.hpp",
-            "tree_layer.hpp",
-            "tree_concepts.hpp"],
-    visibility = ["//visibility:public"]
+            "tree_layer.hpp"],
+)
+
+filegroup(
+    name = "concepts",
+    srcs = ["tree_concepts.hpp",
+            "antlr4_tree_concepts.hpp",
+            "concepts.hpp"]
 )
 
 cc_test(
     name = "base_unittest",
     srcs = [":types",
             ":utilities",
-            ":tree_unittest.cpp",],
+            ":tree_unittest.cpp",
+            ":concepts"],
     deps = ["@antlr4_runtime//:antlr4_runtime",
             "@com_google_googletest//:gtest_main",
             "@rapidcheck//:rapidcheck",
@@ -33,7 +44,12 @@ cc_library(
     name = "base",
     srcs = [":utilities"],
     hdrs = [":types",
-            ":utilities"],
+            ":utilities",
+            ":test_utilities",
+            ":concepts"],
     include_prefix = "base",
+    # Required by :test_utilities
+    deps = ["@com_google_googletest//:gtest_main",
+            "@rapidcheck//:rapidcheck"],
     visibility = ["//visibility:public"]
 )

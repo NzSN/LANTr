@@ -1,17 +1,17 @@
 #ifndef LANTR_BASE_TREE_LAYER_H_
 #define LANTR_BASE_TREE_LAYER_H_
 
+#include <queue>
+#include <algorithm>
+
 #include "base/n_ary_tree.hpp"
-#include "base/tree_concepts.hpp"
+#include "base/concepts.hpp"
 #include "base/utilities/assert.hpp"
 #include "base/utilities/bottom.hpp"
-#include <queue>
 
 namespace LANTr::Base {
 
 template<typename U, typename L>
-requires std::derived_from<L, Tree<L>> ||
-         TreeConcepts::AntlrTree<L>
 class TreeLayer: public Tree<U> {
 public:
   TreeLayer(U* upper, L* lower): Tree<U>(upper), lower_(lower) {
@@ -23,7 +23,7 @@ public:
 
     auto root = std::make_unique<U>(lower);
     for (auto& c: TreeConcepts::GetChildren(lower)) {
-      root->AddChild(BuildFrom(TreeConcepts::GetRawPtr(c)));
+      root->AddChild(BuildFrom(Concepts::GetRawPtr(c)));
     }
 
     return root;
@@ -38,7 +38,7 @@ public:
       this->children_,
       TreeConcepts::GetChildren(lower_));
     for (auto [child, lowerChild]: zipChild) {
-      if (child->lower_ != TreeConcepts::GetRawPtr(lowerChild) ||
+      if (child->lower_ != Concepts::GetRawPtr(lowerChild) ||
           !child->IsLayerEquivalent()) {
         return false;
       }
@@ -52,21 +52,52 @@ public:
     UpdateInvalidateState();
 
     // Rebuild tree from those Invalidated nodes
-    RebuildAllInvalidateNodes();
+    // RebuildAllInvalidateNodes();
   }
 
 private:
   enum InvalidateState {
-    VALID,
+    FIRST_STATE,
+    VALID = FIRST_STATE,
     PARTIAL_VALID,
     INVALID,
+    END_STATE
   };
 
   InvalidateState state_ = VALID;
   std::queue<TreeLayer*> work_list_;
 
-  void RebuildAllInvalidateNodes() {
+  void CorrectPartialNode(TreeLayer& node) {
+
+  }
+
+  void CorrectInvalidNode(TreeLayer& node) {
+
+  }
+
+  void CorrectRelations() {
+    ASSERT(state_ == VALID,
+           "Assumption of Valid of root "
+           "node of subtree is violated");
     ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
+
+    std::for_each(this->begin(), this->end(),
+                  [&](TreeLayer& tree) {
+                    switch (tree.state_) {
+                    case VALID:
+                      break;
+                    case INVALID:
+                      CorrectInvalidNode(tree);
+                      break;
+                    case PARTIAL_VALID:
+                      CorrectPartialNode(tree);
+                      break;
+                    default:
+                      ASSERT(tree.state_ >= FIRST_STATE &&
+                             tree.state_ < END_STATE,
+                             "Invalid state");
+                    }
+                  });
   }
 
   InvalidateState Stepping(TreeLayer* node) {
@@ -80,7 +111,7 @@ private:
         node->children_,
         TreeConcepts::GetChildren(node->lower_));
       for (auto [child, lowerChild]: zipChild) {
-        if (child->lower_ != TreeConcepts::GetRawPtr(lowerChild)) {
+        if (child->lower_ != Concepts::GetRawPtr(lowerChild)) {
           child->state_ = INVALID;
           state = PARTIAL_VALID;
         }

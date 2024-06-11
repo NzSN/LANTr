@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
+#include "base/tree_concepts.hpp"
 #include "parser/ast/antlr_parsetree.hpp"
 #include "parser/languages/language_definitions.hpp"
 #include "parser/languages/language_impl.hpp"
@@ -20,6 +21,9 @@ bool equivalent(LANGUAGE::TreeType<LANGUAGE::ANTLR4>::type* ltree,
       rtree->size() != ltree->children.size()) {
     return false;
   }
+
+  Base::TreeConcepts::GetChildren(rtree);
+  Base::TreeConcepts::GetParent(const_cast<AntlrTree*>(rtree));
 
   auto iter = ltree->children.cbegin();
   for (auto const& c: rtree->GetChildren()) {
