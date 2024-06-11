@@ -2,7 +2,10 @@ filegroup(
     name = "utilities",
     srcs = ["utilities/assert.hpp",
             "utilities/bottom.hpp",
-            "utilities/bottom.cpp"],
+            "utilities/bottom.cpp",
+            "utility.hpp",
+            "test_utility.hpp",
+            "test_utility.cpp"],
     visibility = ["//visibility:public"]
 )
 
@@ -19,7 +22,7 @@ cc_test(
     name = "base_unittest",
     srcs = [":types",
             ":utilities",
-            ":tree_unittest.cpp"],
+            ":tree_unittest.cpp",],
     deps = ["@antlr4_runtime//:antlr4_runtime",
             "@com_google_googletest//:gtest_main",
             "@rapidcheck//:rapidcheck",

@@ -4,6 +4,7 @@
 #include <variant>
 #include <algorithm>
 
+#include "test_utility.hpp"
 #include "base/utilities/bottom.hpp"
 #include "n_ary_tree.hpp"
 #include "tree_layer.hpp"
@@ -40,8 +41,6 @@ RC_GTEST_PROP(ParseTreeTest, ParseTreeNav, ()) {
   }
 
   node.AddChildren(nums);
-
-  //std::make_const_iterator(node.begin());
 
   auto iter = nums.begin();
   for (auto& i: node.GetChildren()) {
@@ -105,18 +104,14 @@ struct TreeLayerTester: public ::testing::Test {
     ASSERT(from == nullptr && to == nullptr, "invalids is dirty");
 
     int numOfNodes = GetNumOfNodes(*upper);
-    int nthToSelect_1st = *rc::gen::inRange(0, GetNumOfNodes(*upper));
-    int nthToSelect_2nd = *rc::gen::inRange(0, GetNumOfNodes(*upper));
-
-    if (nthToSelect_1st == 0 ||
-        nthToSelect_1st % numOfNodes == 0) {
-      nthToSelect_1st += 1;
-    }
-
-    while (nthToSelect_2nd == nthToSelect_1st ||
-           nthToSelect_2nd % numOfNodes == 0) {
-      nthToSelect_2nd += 1;
-    }
+    int nthToSelect_1st = RC::RandomNumUntil(0, numOfNodes,
+                                             [=](int num) -> bool {
+                                               return num !=0 && (num % numOfNodes) != 0;
+                                             });
+    int nthToSelect_2nd = RC::RandomNumUntil(0, numOfNodes,
+                                             [=](int num) -> bool {
+                                               return num != nthToSelect_1st && (num % numOfNodes) != 0;
+                                             });
 
     if (std::find_if(invalidateds.begin(), invalidateds.end(),
                  [&](const int selected) {

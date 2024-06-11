@@ -1,7 +1,6 @@
 startup
 build --cxxopt=-Isrc
 build --cxxopt=-std=c++2b
-build --cxxopt=-fconcepts-diagnostics-depth=10
 build --noincompatible_sandbox_hermetic_tmp
 build --registry=https://raw.githubusercontent.com/NzSN/bazel-central-registry/main/
 
@@ -12,5 +11,6 @@ build:debug --copt -O1
 build:debug --copt -g
 build:debug --copt -fno-omit-frame-pointer
 build:debug --linkopt -fsanitize=address
+build:debug --cxxopt=-fconcepts-diagnostics-depth=10
 
 common --enable_bzlmod

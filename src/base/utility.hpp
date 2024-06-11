@@ -4,4 +4,5 @@
 #include "utilities/assert.hpp"
 #include "utilities/bottom.hpp"
 
+
 #endif // LANTR_BASE_UTILITY_H_
