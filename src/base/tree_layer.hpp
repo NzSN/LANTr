@@ -76,6 +76,9 @@ private:
   }
 
   void CorrectRelations() {
+    ASSERT(state_ == VALID,
+           "Assumption of Valid of root "
+           "node of subtree is violated");
     ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
 
     std::for_each(this->begin(), this->end(),

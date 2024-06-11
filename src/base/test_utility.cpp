@@ -4,6 +4,7 @@
 
 namespace LANTr::Base::RC {
 
+[[nodiscard]]
 int RandomNumUntil(int min, int max, std::function<bool(int)> predicate) {
   int num;
   do {
