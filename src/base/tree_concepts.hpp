@@ -4,49 +4,44 @@
 #include <concepts>
 #include <ranges>
 
-#include "base/n_ary_tree.hpp"
-
-#include <memory>
-
 namespace LANTr::Base::TreeConcepts {
 
-template<typename T>
-concept AntlrTree = requires(T& t) {
-  { t.parent } -> std::convertible_to<T*>;
-  { t.children } -> std::ranges::range;
-};
-
+///////////////////////////////////////////////////////////////////////////////
+//                         Operation of Tree Concepts                        //
+///////////////////////////////////////////////////////////////////////////////
 template<typename T>
 auto GetChildren(T*);
 
 template<typename T>
-requires TreeConcepts::AntlrTree<T>
-auto GetChildren(T* tree) {
-  return tree->children;
-}
+T* GetParent(T*);
+
 
 template<typename T>
-requires std::derived_from<T, Tree<T>>
+concept InternalTree = requires(T& t) {
+  { t.GetChildren() } -> std::ranges::range;
+  { t.Parent() } -> std::convertible_to<T*>;
+};
+
+template<InternalTree T>
 auto& GetChildren(T* tree) {
   return tree->GetChildren();
 }
 
-template<typename T>
-requires std::is_pointer_v<T>
-T GetRawPtr(T t) {
-  return t;
+template<InternalTree T>
+auto* GetParent(T* tree) {
+  return tree->Parent();
 }
 
-template<typename T>
-T* GetRawPtr(std::unique_ptr<T>& ptr) {
-  return ptr.get();
-}
+#include "base/antlr4_tree_concepts.hpp"
 
+///////////////////////////////////////////////////////////////////////////////
+//                               Tree Concepts                               //
+///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-T* GetRawPtr(std::shared_ptr<T>& ptr) {
-  return ptr.get();
-}
-
+concept NAryTree = requires(T& t) {
+  { GetParent(&t) } -> std::convertible_to<T*>;
+  { GetChildren(&t) } -> std::ranges::range;
+};
 
 } // LANTr::Base::TreeConcepts
 

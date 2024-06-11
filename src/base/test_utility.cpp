@@ -1,4 +1,5 @@
 #include <functional>
+#include <gtest/gtest.h>
 #include <rapidcheck/gtest.h>
 
 namespace LANTr::Base::RC {
