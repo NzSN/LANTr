@@ -148,7 +148,7 @@ private:
   // TODO: Naive implementation, lack of performance
   void CorrectPartialNode(TreeLayer& node) {
     ASSERT_SLOW(/* Invalid or missed nodes in thie layer or */
-                (TreeConcepts::NumOfChildren(&node) !=
+                (TreeConcepts::NumOfChildren(reinterpret_cast<U*>(&node)) !=
                  TreeConcepts::NumOfChildren(node.lower_)) ||
                 /* in indirect descdents */
                 (std::find_if(node.begin(), node.end(),
