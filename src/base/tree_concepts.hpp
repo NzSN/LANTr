@@ -3,6 +3,8 @@
 
 #include <concepts>
 #include <ranges>
+#include <vector>
+#include <memory>
 
 namespace LANTr::Base::TreeConcepts {
 
@@ -10,7 +12,7 @@ namespace LANTr::Base::TreeConcepts {
 //                         Operation of Tree Concepts                        //
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-auto& GetChildren(T*);
+auto GetChildren(T*);
 
 template<typename T>
 T* GetParent(T*);

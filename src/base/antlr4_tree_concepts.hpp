@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <ranges>
+#include <vector>
 
 template<typename T>
 concept AntlrTree = requires(T& t) {
@@ -11,7 +12,7 @@ concept AntlrTree = requires(T& t) {
 };
 
 template<AntlrTree T>
-auto& GetChildren(T* tree) {
+auto GetChildren(T* tree) -> decltype(std::vector<T*>{}) & {
   return tree->children;
 }
 
