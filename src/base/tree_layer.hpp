@@ -7,7 +7,6 @@
 #include <queue>
 #include <algorithm>
 
-#include "base/antlr4_tree_concepts.hpp"
 #include "base/n_ary_tree.hpp"
 #include "base/concepts.hpp"
 #include "base/tree_concepts.hpp"
@@ -26,7 +25,6 @@ public:
   }
 
   static std::unique_ptr<U> BuildFrom(L* lower) {
-    std::cout << std::format("Hello {} !\n", "World");
     ASSERT(lower != nullptr, "BuildFrom nullptr");
 
     auto root = std::make_unique<U>(lower);
@@ -78,7 +76,9 @@ private:
   };
 
   bool SwitchToValid() {
-    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+    ASSERT((this->parent_ &&
+           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
+           || !this->parent_);
 
     if (this->state_ == VALID) {
       return true;
@@ -104,7 +104,9 @@ private:
   }
 
   bool SwitchToPartialValid() {
-    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+    ASSERT((this->parent_ &&
+           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
+           || !this->parent_);
 
     if (this->state_ == PARTIAL_VALID) {
       return true;
@@ -115,20 +117,26 @@ private:
     if (this->parent_) {
       reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
     }
+
+    return true;
   }
 
   bool SwitchToInvalid() {
-    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+    ASSERT((this->parent_ &&
+           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
+           || !this->parent_);
 
     if (this->state_ == INVALID) {
       return true;
     }
 
-    this->state_ = PARTIAL_VALID;
+    this->state_ = INVALID;
 
     if (this->parent_) {
       reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
     }
+
+    return true;
   }
 
   InvalidateState state_ = VALID;
@@ -167,29 +175,24 @@ private:
                 "Some nodes still in invalid state after correct");
   }
 
-  InvalidateState Stepping(TreeLayer* node) {
-    InvalidateState state = VALID;
-
+  void Stepping(TreeLayer* node) {
     if (node->size() !=
         TreeConcepts::GetChildren(node->lower_).size()) {
-      state = PARTIAL_VALID;
+      node->SwitchToPartialValid();
     } else {
       auto zipChild = std::views::zip(
         node->children_,
         TreeConcepts::GetChildren(node->lower_));
       for (auto [child, lowerChild]: zipChild) {
         if (child->lower_ != Concepts::GetRawPtr(lowerChild)) {
-          child->state_ = INVALID;
-          state = PARTIAL_VALID;
+          child->SwitchToInvalid();
         }
       }
     }
-
-    return state;
   }
 
   void UpdateInvalidateStateStep(TreeLayer* current) {
-    current->state_ = Stepping(current);
+    Stepping(current);
 
     for (auto& child: current->GetChildren()) {
       if (child->state_ == INVALID) {
