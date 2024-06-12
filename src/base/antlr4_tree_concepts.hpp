@@ -20,4 +20,9 @@ T* GetParent(T* tree) {
   return tree->parent;
 }
 
+template<AntlrTree T>
+size_t NumOfChildren(T* tree) {
+  return std::ranges::size(GetChildren(tree));
+}
+
 #endif /* LANTR_BASE_ANTLR4_TREE_CONCEPTS_H_ */

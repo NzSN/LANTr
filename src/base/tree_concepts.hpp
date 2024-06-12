@@ -15,7 +15,12 @@ auto GetChildren(T*);
 template<typename T>
 T* GetParent(T*);
 
+template<typename T>
+size_t NumOfChildren(T*);
 
+///////////////////////////////////////////////////////////////////////////////
+//                           Operation Definitions                           //
+///////////////////////////////////////////////////////////////////////////////
 template<typename T>
 concept InternalTree = requires(T& t) {
   { t.GetChildren() } -> std::ranges::range;
@@ -30,6 +35,11 @@ auto& GetChildren(T* tree) {
 template<InternalTree T>
 auto* GetParent(T* tree) {
   return tree->Parent();
+}
+
+template<InternalTree T>
+size_t NumOfChildren(T* tree) {
+  return std::ranges::size(GetChildren(tree));
 }
 
 #include "base/antlr4_tree_concepts.hpp"
