@@ -4,6 +4,7 @@
 #include <format>
 #include <functional>
 #include <iostream>
+#include <iterator>
 #include <queue>
 #include <algorithm>
 
@@ -58,7 +59,7 @@ public:
     UpdateInvalidateState();
 
     // Rebuild tree from those Invalidated nodes
-    // CorrectRelations();
+    CorrectRelations();
   }
 
 private:
@@ -67,7 +68,7 @@ private:
     VALID = FIRST_STATE,
     // There are some direct or indirect
     // nodes not in VALID state.
-    PARTIAL_VALID,
+    PARTIALLY_VALID,
     // Mapping from upper to lower of a INVALID node
     // and all it's direct and indirect childrent are
     // INVALID.
@@ -77,8 +78,8 @@ private:
 
   bool SwitchToValid() {
     ASSERT((this->parent_ &&
-           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
-           || !this->parent_);
+            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
+           (!this->parent_ && this->state_ != INVALID));
 
     if (this->state_ == VALID) {
       return true;
@@ -86,8 +87,10 @@ private:
 
     bool ableToSwitch =
       std::find_if(this->children_.begin(), this->children_.end(),
-                 [](TreeLayer& u) { u.state_ != VALID; })
-      != this->children_.end();
+                   [](const std::unique_ptr<U>& u) {
+                     return u->state_ != VALID;
+                   })
+      == this->children_.end();
 
     if (!ableToSwitch) {
       return false;
@@ -105,14 +108,14 @@ private:
 
   bool SwitchToPartialValid() {
     ASSERT((this->parent_ &&
-           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
-           || !this->parent_);
+            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
+           (!this->parent_ && this->state_ != INVALID));
 
-    if (this->state_ == PARTIAL_VALID) {
+    if (this->state_ == PARTIALLY_VALID) {
       return true;
     }
 
-    this->state_ = PARTIAL_VALID;
+    this->state_ = PARTIALLY_VALID;
 
     if (this->parent_) {
       reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
@@ -123,8 +126,8 @@ private:
 
   bool SwitchToInvalid() {
     ASSERT((this->parent_ &&
-           reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID)
-           || !this->parent_);
+            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
+           (!this->parent_ && this->state_ != INVALID));
 
     if (this->state_ == INVALID) {
       return true;
@@ -142,25 +145,36 @@ private:
   InvalidateState state_ = VALID;
   std::queue<TreeLayer*> work_list_;
 
+  // TODO: Naive implementation, lack of performance
   void CorrectPartialNode(TreeLayer& node) {
     ASSERT(TreeConcepts::NumOfChildren(&node) !=
            TreeConcepts::NumOfChildren(node.lower_));
-    ASSERT(node.state_ == PARTIAL_VALID);
-  }
+    ASSERT(node.state_ == PARTIALLY_VALID);
 
-  void CorrectInvalidNode(TreeLayer& node) {
+    auto& lowerChildren = TreeConcepts::GetChildren(node.lower_);
+    node.children_.clear();
 
+    std::for_each(lowerChildren.begin(), lowerChildren.end(),
+                  [&](const std::unique_ptr<L>& l) {
+                    node.AddChild(TreeLayer<U,L>::BuildFrom(l.get()));
+                  });
+
+    node.SwitchToValid();
   }
 
   void CorrectStep(TreeLayer& node) {
     // Each Correcting Step must start from a
-    // VALID or PARTIAL_VALID node.
+    // VALID or PARTIALLY_VALID node.
     ASSERT(node.state_ == VALID ||
-           node.state_ == PARTIAL_VALID);
+           node.state_ == PARTIALLY_VALID);
+
+    if (node.state_ == PARTIALLY_VALID) {
+      CorrectPartialNode(node);
+    }
   }
 
   void CorrectRelations() {
-    ASSERT(state_ == VALID);
+    ASSERT(state_ != INVALID);
     ASSERT(work_list_.empty());
 
     std::for_each(this->begin(), this->end(),

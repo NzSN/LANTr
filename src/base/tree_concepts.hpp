@@ -37,6 +37,11 @@ T* GetParent(T* tree) {
   return tree->Parent();
 }
 
+template<InternalTree T>
+size_t NumOfChildren(T* tree) {
+  return GetChildren(tree).size();
+}
+
 #include "base/antlr4_tree_concepts.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////
