@@ -1,10 +1,7 @@
 #ifndef LANTR_BASE_TREE_LAYER_H_
 #define LANTR_BASE_TREE_LAYER_H_
 
-#include <format>
 #include <functional>
-#include <iostream>
-#include <iterator>
 #include <queue>
 #include <algorithm>
 
@@ -12,7 +9,6 @@
 #include "base/concepts.hpp"
 #include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
-#include "base/utilities/bottom.hpp"
 
 namespace LANTr::Base {
 
