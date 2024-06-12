@@ -319,9 +319,12 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, Invalidate, ()) {
   std::for_each(invalidatedFounds.begin(),
                 invalidatedFounds.end(),
                 [&](const Upper* node) {
-                  if (node->Parent() != nullptr) {
-                    RC_ASSERT(IsPartialNode(node->Parent()));
+                  Upper* parent = node->Parent();
+                  while (parent) {
+                    RC_ASSERT(IsPartialNode(parent));
+                    parent = parent->Parent();
                   }
+
                   RC_ASSERT(std::find(invalidatedNodes.begin(),
                             invalidatedNodes.end(), node) !=
                             invalidatedNodes.end());
@@ -347,11 +350,11 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, PartialCheck, ()) {
                 });
 }
 
-// RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
-//   auto layer = GetLayers<false>();
-//   RC_ASSERT(!layer->IsLayerEquivalent());
-//   layer->Synchronize();
-//   RC_ASSERT(layer->IsLayerEquivalent());
-// }
+RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
+  auto layer = GetLayers<false>();
+  RC_ASSERT(!layer->IsLayerEquivalent());
+  layer->Synchronize();
+  RC_ASSERT(layer->IsLayerEquivalent());
+}
 
 } // LANTr::Base

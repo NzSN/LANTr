@@ -7,7 +7,7 @@ build --registry=https://raw.githubusercontent.com/NzSN/bazel-central-registry/m
 build:debug --strip=never
 build:debug --copt -fsanitize=address
 build:debug --copt -DADDRESS_SANITIZER
-build:debug --copt -O1
+build:debug --copt -O0
 build:debug --copt -g
 build:debug --copt -fno-omit-frame-pointer
 build:debug --linkopt -fsanitize=address
