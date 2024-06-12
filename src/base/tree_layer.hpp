@@ -1,9 +1,13 @@
 #ifndef LANTR_BASE_TREE_LAYER_H_
 #define LANTR_BASE_TREE_LAYER_H_
 
+#include <format>
+#include <functional>
+#include <iostream>
 #include <queue>
 #include <algorithm>
 
+#include "base/antlr4_tree_concepts.hpp"
 #include "base/n_ary_tree.hpp"
 #include "base/concepts.hpp"
 #include "base/tree_concepts.hpp"
@@ -22,6 +26,7 @@ public:
   }
 
   static std::unique_ptr<U> BuildFrom(L* lower) {
+    std::cout << std::format("Hello {} !\n", "World");
     ASSERT(lower != nullptr, "BuildFrom nullptr");
 
     auto root = std::make_unique<U>(lower);
@@ -55,52 +60,111 @@ public:
     UpdateInvalidateState();
 
     // Rebuild tree from those Invalidated nodes
-    // RebuildAllInvalidateNodes();
+    // CorrectRelations();
   }
 
 private:
   enum InvalidateState {
     FIRST_STATE,
     VALID = FIRST_STATE,
+    // There are some direct or indirect
+    // nodes not in VALID state.
     PARTIAL_VALID,
+    // Mapping from upper to lower of a INVALID node
+    // and all it's direct and indirect childrent are
+    // INVALID.
     INVALID,
     END_STATE
   };
+
+  bool SwitchToValid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+
+    if (this->state_ == VALID) {
+      return true;
+    }
+
+    bool ableToSwitch =
+      std::find_if(this->children_.begin(), this->children_.end(),
+                 [](TreeLayer& u) { u.state_ != VALID; })
+      != this->children_.end();
+
+    if (!ableToSwitch) {
+      return false;
+    }
+
+    this->state_ = VALID;
+
+    // Maintain invariant of state
+    if (this->parent_) {
+      reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToValid();
+    }
+
+    return true;
+  }
+
+  bool SwitchToPartialValid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+
+    if (this->state_ == PARTIAL_VALID) {
+      return true;
+    }
+
+    this->state_ = PARTIAL_VALID;
+
+    if (this->parent_) {
+      reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
+    }
+  }
+
+  bool SwitchToInvalid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+
+    if (this->state_ == INVALID) {
+      return true;
+    }
+
+    this->state_ = PARTIAL_VALID;
+
+    if (this->parent_) {
+      reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
+    }
+  }
 
   InvalidateState state_ = VALID;
   std::queue<TreeLayer*> work_list_;
 
   void CorrectPartialNode(TreeLayer& node) {
-
+    ASSERT(TreeConcepts::NumOfChildren(&node) !=
+           TreeConcepts::NumOfChildren(node.lower_));
+    ASSERT(node.state_ == PARTIAL_VALID);
   }
 
   void CorrectInvalidNode(TreeLayer& node) {
 
   }
 
+  void CorrectStep(TreeLayer& node) {
+    // Each Correcting Step must start from a
+    // VALID or PARTIAL_VALID node.
+    ASSERT(node.state_ == VALID ||
+           node.state_ == PARTIAL_VALID);
+  }
+
   void CorrectRelations() {
-    ASSERT(state_ == VALID,
-           "Assumption of Valid of root "
-           "node of subtree is violated");
-    ASSERT(work_list_.empty(), "Invalidated state of tree is not clean");
+    ASSERT(state_ == VALID);
+    ASSERT(work_list_.empty());
 
     std::for_each(this->begin(), this->end(),
-                  [&](TreeLayer& tree) {
-                    switch (tree.state_) {
-                    case VALID:
-                      break;
-                    case INVALID:
-                      CorrectInvalidNode(tree);
-                      break;
-                    case PARTIAL_VALID:
-                      CorrectPartialNode(tree);
-                      break;
-                    default:
-                      ASSERT(tree.state_ >= FIRST_STATE &&
-                             tree.state_ < END_STATE,
-                             "Invalid state");
-                    }
-                  });
+                  std::bind(&TreeLayer::CorrectStep,
+                            this, std::placeholders::_1));
+
+    ASSERT_SLOW(std::find_if(
+                  this->begin(), this->end(),
+                  [](TreeLayer& layer) -> bool{
+                    return layer.state_ != VALID;
+                  }) == this->end(),
+                "Some nodes still in invalid state after correct");
   }
 
   InvalidateState Stepping(TreeLayer* node) {

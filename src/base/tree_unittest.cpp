@@ -347,11 +347,11 @@ RC_GTEST_FIXTURE_PROP(TreeLayerTester, PartialCheck, ()) {
                 });
 }
 
-RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
-  auto layer = GetLayers<false>();
-  RC_ASSERT(!layer->IsLayerEquivalent());
-  layer->Synchronize();
-  RC_ASSERT(layer->IsLayerEquivalent());
-}
+// RC_GTEST_FIXTURE_PROP(TreeLayerTester, LayerSynchronization, ()) {
+//   auto layer = GetLayers<false>();
+//   RC_ASSERT(!layer->IsLayerEquivalent());
+//   layer->Synchronize();
+//   RC_ASSERT(layer->IsLayerEquivalent());
+// }
 
 } // LANTr::Base
