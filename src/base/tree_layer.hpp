@@ -72,10 +72,13 @@ private:
     END_STATE
   };
 
+#define SWITCH_PRECOND_ASSERT                                                \
+  ASSERT((this->parent_ &&                                                   \
+          reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) || \
+         (!this->parent_ && this->state_ != INVALID))
+
   bool SwitchToValid() {
-    ASSERT((this->parent_ &&
-            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
-           (!this->parent_ && this->state_ != INVALID));
+    SWITCH_PRECOND_ASSERT;
 
     if (this->state_ == VALID) {
       return true;
@@ -103,9 +106,7 @@ private:
   }
 
   bool SwitchToPartialValid() {
-    ASSERT((this->parent_ &&
-            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
-           (!this->parent_ && this->state_ != INVALID));
+    SWITCH_PRECOND_ASSERT;
 
     if (this->state_ == PARTIALLY_VALID) {
       return true;
@@ -121,9 +122,7 @@ private:
   }
 
   bool SwitchToInvalid() {
-    ASSERT((this->parent_ &&
-            reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID) ||
-           (!this->parent_ && this->state_ != INVALID));
+    SWITCH_PRECOND_ASSERT;
 
     if (this->state_ == INVALID) {
       return true;
