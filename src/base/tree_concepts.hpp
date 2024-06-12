@@ -3,6 +3,7 @@
 
 #include <concepts>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 #include <vector>
 #include <memory>
@@ -31,10 +32,8 @@ concept InternalTree = requires(T& t) {
 };
 
 template<InternalTree T>
-auto GetChildren(T* tree) ->
-  decltype(std::ranges::range<decltype(tree->GetChildren())> ?
-           decltype(tree->GetChildren()){} : bool{})& {
-
+auto& GetChildren(T* tree) {
+  static_assert(std::ranges::range<decltype(tree->GetChildren())>);
   return tree->GetChildren();
 }
 
