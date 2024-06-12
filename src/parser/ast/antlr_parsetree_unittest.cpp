@@ -22,9 +22,6 @@ bool equivalent(LANGUAGE::TreeType<LANGUAGE::ANTLR4>::type* ltree,
     return false;
   }
 
-  Base::TreeConcepts::GetChildren(rtree);
-  Base::TreeConcepts::GetParent(const_cast<AntlrTree*>(rtree));
-
   auto iter = ltree->children.cbegin();
   for (auto const& c: rtree->GetChildren()) {
     ASSERT(iter < ltree->children.cend(), "out of range");
