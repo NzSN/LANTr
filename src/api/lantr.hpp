@@ -26,7 +26,7 @@ public:
   LANTr(std::initializer_list<RewriteRule> rules):
     rules_{rules} {}
 
-  Source trans(Source s) {
+  Source operator()(Source s) {
     Base::Utility::Bottom::Unreachable(
       Base::Utility::Bottom::Reason::NOT_IMPLEMENTED);
   }

@@ -18,7 +18,7 @@ RC_GTEST_PROP(LANTrApp, Main, ()) {
     "console.log(message);"
   };
 
-  Base::Types::Source transed{tr.trans(source)};
+  Base::Types::Source transed{tr(source)};
   Base::Types::Source expected{
     "let message: string = 'World, Hello!';"
     "console.log(message);"
