@@ -4,8 +4,9 @@
 #include <iostream>
 
 #ifdef NDEBUG
-#defien ASSERT(COND, MSG)
+#define ASSERT(COND, MSG)
 #else
+
 #define ASSERT(COND, MSG)                               \
   do {                                                  \
     if (!(COND)) {                                      \
@@ -17,7 +18,13 @@
       std::abort();                                     \
     }                                                   \
   } while (0);
-#endif // NDEBUG
 
+#ifdef NO_SLOW_ASSERT
+#define ASSERT_SLOW(COND, MSG)
+#else
+#define ASSERT_SLOW(COND, MSG) ASSERT(COND, MSG)
+#endif // NO_SLOW_ASSERT
+
+#endif // NDEBUG
 
 #endif // LANTR_BASE_UTILITY_ASSERT_H_
