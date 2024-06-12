@@ -78,6 +78,8 @@ private:
   };
 
   bool SwitchToValid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+
     if (this->state_ == VALID) {
       return true;
     }
@@ -102,17 +104,31 @@ private:
   }
 
   bool SwitchToPartialValid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
+
     if (this->state_ == PARTIAL_VALID) {
       return true;
     }
 
     this->state_ = PARTIAL_VALID;
 
-
+    if (this->parent_) {
+      reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
+    }
   }
 
-  void SwitchToInvalid() {
+  bool SwitchToInvalid() {
+    ASSERT(reinterpret_cast<TreeLayer*>(this->parent_)->state_ != INVALID);
 
+    if (this->state_ == INVALID) {
+      return true;
+    }
+
+    this->state_ = PARTIAL_VALID;
+
+    if (this->parent_) {
+      reinterpret_cast<TreeLayer*>(this->parent_)->SwitchToPartialValid();
+    }
   }
 
   InvalidateState state_ = VALID;
@@ -122,10 +138,6 @@ private:
     ASSERT(TreeConcepts::NumOfChildren(&node) !=
            TreeConcepts::NumOfChildren(node.lower_));
     ASSERT(node.state_ == PARTIAL_VALID);
-
-
-
-
   }
 
   void CorrectInvalidNode(TreeLayer& node) {

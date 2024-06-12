@@ -10,7 +10,7 @@ namespace LANTr::Base::TreeConcepts {
 //                         Operation of Tree Concepts                        //
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-auto GetChildren(T*);
+auto& GetChildren(T*);
 
 template<typename T>
 T* GetParent(T*);
@@ -33,13 +33,8 @@ auto& GetChildren(T* tree) {
 }
 
 template<InternalTree T>
-auto* GetParent(T* tree) {
+T* GetParent(T* tree) {
   return tree->Parent();
-}
-
-template<InternalTree T>
-size_t NumOfChildren(T* tree) {
-  return std::ranges::size(GetChildren(tree));
 }
 
 #include "base/antlr4_tree_concepts.hpp"
