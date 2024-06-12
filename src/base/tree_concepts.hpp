@@ -27,6 +27,9 @@ concept InternalTree = requires(T& t) {
   { t.Parent() } -> std::convertible_to<T*>;
 };
 
+// TODO: There is no constraint to restrict the return type
+//       which implies that caller is unable to handle Children
+//       return by this function in a unified way.
 template<InternalTree T>
 auto& GetChildren(T* tree) {
   return tree->GetChildren();
