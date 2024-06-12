@@ -66,7 +66,7 @@ private:
     // nodes not in VALID state.
     PARTIALLY_VALID,
     // Mapping from upper to lower of a INVALID node
-    // and all it's direct and indirect childrent are
+    // and all it's direct and indirect children are
     // INVALID.
     INVALID,
     END_STATE
