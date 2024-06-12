@@ -6,6 +6,7 @@
 
 #include "base/n_ary_tree.hpp"
 #include "base/concepts.hpp"
+#include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
 #include "base/utilities/bottom.hpp"
 
@@ -16,6 +17,8 @@ class TreeLayer: public Tree<U> {
 public:
   TreeLayer(U* upper, L* lower): Tree<U>(upper), lower_(lower) {
     static_assert(std::derived_from<U, TreeLayer<U,L>>);
+    static_assert(TreeConcepts::NAryTree<U>);
+    static_assert(TreeConcepts::NAryTree<L>);
   }
 
   static std::unique_ptr<U> BuildFrom(L* lower) {

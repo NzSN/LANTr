@@ -142,8 +142,8 @@ public:
   Tree(T* current):
     parent_{nullptr}, current_{current} {
 
-    static_assert(std::derived_from<T, Tree<T>>);
     static_assert(TreeConcepts::NAryTree<T>);
+    static_assert(std::derived_from<T, Tree<T>>);
   }
 
 protected:
