@@ -285,7 +285,7 @@ struct TreeLayerTester: public ::testing::Test {
   }
 
   bool IsPartialNode(Upper* upper) {
-    return upper->state_ == TreeLayer<Upper, Lower>::PARTIAL_VALID;
+    return upper->state_ == TreeLayer<Upper, Lower>::PARTIALLY_VALID;
   }
 
 
