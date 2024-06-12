@@ -8,10 +8,16 @@
 #define ASSERT(COND, MSG)
 #else
 
-#define ASSERT_WITHOUT_MSG(COND)      \
-  do {                                \
-    if (!(COND)) std::abort();        \
+#define ASSERT_WITHOUT_MSG(COND)                            \
+  do {                                                      \
+    if (!(COND)) {                                          \
+      std::cerr << std::format(                             \
+        "Assertion failed with condition ({}) at {}:{} \n", \
+        #COND, __FILE__, std::to_string(__LINE__));         \
+      std::abort();                                         \
+    }                                                       \
   } while(0);
+
 #define ASSERT_WITH_MSG(COND, MSG)                \
   do {                                            \
     if (!(COND)) {                                \
