@@ -11,6 +11,18 @@ filegroup(
     visibility = ["//visibility:public"]
 )
 
+filegroup(
+    name = "languages_hdrs",
+    srcs = ["language.hpp",
+            "language_definitions.hpp",
+            "//src/parser/languages/javascript:javascript_hdrs",
+            "//src/parser/languages/typescript:typescript_hdrs",
+            "//src/parser/languages/InternalLang/Arith:arith_hdrs"],
+    visibility = ["//visibility:public"]
+)
+
+
+
 cc_test(
     name = "languages_unittest",
     srcs = [":languages_srcs"],
