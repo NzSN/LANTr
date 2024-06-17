@@ -10,9 +10,8 @@ RC_GTEST_PROP(AntlrParserTest, Parse, ()) {
   LANTr::Base::Types::Source source = "1 + 1";
 
   {
-    ParserImpl parserImpl;
     ParseResult result =
-      parserImpl.Parse<ARITH>(source);
+      ParserImpl::Parse<ARITH>(source);
 
     RC_ASSERT(result.tree);
     RC_ASSERT(result.tree->getText() == "1+1");
