@@ -6,11 +6,11 @@
 namespace LANTr::Parser::AST {
 
 [[nodiscard]] bool AntlrTree::operator==(const AntlrTree& other) const {
-  auto iter_l = this->cbegin();
-  auto iter_r = other.cbegin();
+  auto iter_l = this->begin();
+  auto iter_r = other.begin();
 
-  for (; iter_l != this->cend() &&
-         iter_r != other.cend(); ++iter_l, ++iter_r) {
+  for (; iter_l != this->end() &&
+         iter_r != other.end(); ++iter_l, ++iter_r) {
     if (iter_l->children_.size() != iter_r->children_.size() ||
         iter_l->Text() != iter_r->Text() ||
         iter_l->TreeType() != iter_r->TreeType()) {
@@ -18,7 +18,7 @@ namespace LANTr::Parser::AST {
     }
   }
 
-  if (iter_l == this->cend() && iter_r == other.cend()) {
+  if (iter_l == this->end() && iter_r == other.end()) {
     return true;
   } else {
     return false;

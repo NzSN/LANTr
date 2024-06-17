@@ -4,14 +4,13 @@
 #include "antlr4-runtime.h"
 #include "base/tree_layer.hpp"
 #include "parser/ast/pattern_matching/matchable.hpp"
-#include <cstdint>
 
 namespace LANTr::Parser::AST {
 
 using InternalTree = antlr4::tree::ParseTree;
 
 class AntlrTree: public Base::TreeLayer<AntlrTree, InternalTree>,
-                 public Pattern<AntlrTree> {
+                 public Matchable<AntlrTree> {
 public:
   AntlrTree(InternalTree* tree): TreeLayer(this, tree) {}
 

@@ -1,24 +1,26 @@
 #ifndef LANTR_PARSER_AST_PATTERN_MATCHING_MATCHABLE_H_
 #define LANTR_PARSER_AST_PATTERN_MATCHING_MATCHABLE_H_
 
-#include "base/tree_concepts.hpp"
 #include <concepts>
-#include <type_traits>
+#include <algorithm>
+
+#include "base/tree_concepts.hpp"
+#include "base/utilities/assert.hpp"
 
 namespace LANTr::Parser::AST {
 
 template<typename T>
-concept IsPattern = requires(T& t, T& o) {
+concept IsMatchable = requires(T& t, T& o) {
   { t.IsVar() } -> std::same_as<bool>;
   { t.operator==(o) } -> std::same_as<bool>;
   { t.bound() } -> std::same_as<T*>;
 };
 
 template<typename T>
-class Pattern {
+class Matchable {
 public:
-  Pattern(bool is_var = false): is_var_{is_var} {
-    static_assert(IsPattern<T>);
+  Matchable(bool is_var = false): is_var_{is_var} {
+    static_assert(IsMatchable<T>);
   }
 
   [[nodiscard]] bool IsVar() const {
@@ -39,13 +41,23 @@ private:
 };
 
 template<typename T>
-requires std::derived_from<T, Pattern<T>>
+requires std::derived_from<T, Matchable<T>> &&
+         Base::TreeConcepts::NAryTree<T>
 [[nodiscard]]
-std::vector<Pattern<T>*>
-PatternMatching(T* tree, Pattern<T>* pattern) {
+std::vector<Matchable<T>>
+PatternMatching(const T* tree,
+                const T* pattern) {
+  ASSERT(tree && pattern);
 
+  std::vector<Matchable<T>> matchs;
+
+  std::for_each(tree->begin(), tree->end(),
+                [&](T& t) {
+
+                });
+
+  return matchs;
 }
-
 
 } // LANTr::Parser::AST
 
