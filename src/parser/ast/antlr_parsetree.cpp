@@ -5,24 +5,18 @@
 
 namespace LANTr::Parser::AST {
 
+bool AntlrTree::IsNodeValueEqual(
+  const AntlrTree& tree,
+  const AntlrTree& other) const {
+
+  return
+    tree.children_.size() == other.children_.size() &&
+    tree.Text() == other.Text() &&
+    tree.TreeType() == other.TreeType();
+}
+
 [[nodiscard]] bool AntlrTree::operator==(const AntlrTree& other) const {
-  auto iter_l = this->cbegin();
-  auto iter_r = other.cbegin();
-
-  for (; iter_l != this->cend() &&
-         iter_r != other.cend(); ++iter_l, ++iter_r) {
-    if (iter_l->children_.size() != iter_r->children_.size() ||
-        iter_l->Text() != iter_r->Text() ||
-        iter_l->TreeType() != iter_r->TreeType()) {
-      return false;
-    }
-  }
-
-  if (iter_l == this->cend() && iter_r == other.cend()) {
-    return true;
-  } else {
-    return false;
-  }
+  return IsNodeValueEqual(*this, other);
 }
 
 } // LANTr::Parser::AST

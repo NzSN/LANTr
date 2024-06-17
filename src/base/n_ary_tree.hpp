@@ -83,7 +83,15 @@ public:
       return *node_;
     }
 
+    const T& operator*() const {
+      return *node_;
+    }
+
     T* operator->() {
+      return node_;
+    }
+
+    const T* operator->() const {
       return node_;
     }
 
@@ -101,11 +109,11 @@ public:
     return iterator(current_, true);
   }
 
-  auto cbegin() const {
+  auto begin() const {
     return iterator(current_);
   }
 
-  auto cend() const {
+  auto end() const {
     return iterator(current_, true);
   }
 
