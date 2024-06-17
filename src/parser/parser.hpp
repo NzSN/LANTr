@@ -19,7 +19,6 @@ public:
     result_{std::move(r)},
     tree_{Info::Tree::BuildFrom(result_.tree)},
     tree{tree_.get()} {}
-
 private:
   LANGUAGE::ParseResult<L> result_;
   std::unique_ptr<typename Info::Tree> tree_;

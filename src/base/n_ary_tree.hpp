@@ -79,8 +79,12 @@ public:
       return !this->operator==(other);
     }
 
-    T& operator*() const {
+    T& operator*() {
       return *node_;
+    }
+
+    T* operator->() {
+      return node_;
     }
 
   private:
@@ -94,6 +98,14 @@ public:
   }
 
   auto end() {
+    return iterator(current_, true);
+  }
+
+  auto cbegin() const {
+    return iterator(current_);
+  }
+
+  auto cend() const {
     return iterator(current_, true);
   }
 

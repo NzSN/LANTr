@@ -7,6 +7,7 @@ filegroup(
     name = "ast",
     srcs = [":ast_hdrs",
             "antlr_parsetree.cpp",
+            "pattern_matching/matchable.hpp",
             ],
     visibility = ["//visibility:public"]
 )
