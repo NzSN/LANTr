@@ -8,21 +8,44 @@
 namespace LANTr::Parser::AST {
 
 template<typename T>
-concept is_matchable = requires(T& t, T& o) {
-  { t.match(o) } -> std::same_as<bool>;
+concept IsPattern = requires(T& t, T& o) {
+  { t.IsVar() } -> std::same_as<bool>;
+  { t.operator==(o) } -> std::same_as<bool>;
+  { t.bound() } -> std::same_as<T*>;
 };
 
 template<typename T>
-class Matchable {
+class Pattern {
 public:
-  Matchable() {
-    static_assert(Base::TreeConcepts::NAryTree<T>);
+  Pattern(bool is_var = false): is_var_{is_var} {
+    static_assert(IsPattern<T>);
   }
 
-  bool match(Matchable& other) {
-
+  [[nodiscard]] bool IsVar() const {
+    return is_var_;
   }
+
+  [[nodiscard]] T* bound() {
+    return bound_;
+  }
+
+  void SetBound(T* bound) {
+    bound_ = bound;
+  }
+
+private:
+  bool is_var_;
+  T* bound_;
 };
+
+template<typename T>
+requires std::derived_from<T, Pattern<T>>
+[[nodiscard]]
+std::vector<Pattern<T>*>
+PatternMatching(T* tree, Pattern<T>* pattern) {
+
+}
+
 
 } // LANTr::Parser::AST
 
