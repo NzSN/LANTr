@@ -29,7 +29,7 @@ class ParserImpl {
 public:
   template<LANGUAGE L>
   requires CanParsedBy<L, ANTLR4>
-  ParseResult<L> Parse(Base::Types::Source source);
+  static ParseResult<L> Parse(Base::Types::Source source);
 };
 
 template<LANGUAGE L>

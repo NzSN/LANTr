@@ -1,10 +1,13 @@
 cc_library(
     name = "parser",
     srcs = ["parser.hpp",
+            "parser.cpp",
+            "parser_info.hpp",
             "//src/parser/ast:ast",
             "//src/parser/languages:languages_srcs",
             ],
     hdrs = ["parser.hpp",
+            "parser_info.hpp",
             "//src/parser/ast:ast_hdrs",
             "//src/parser/languages/typescript:typescript_hdrs",
             "//src/parser/languages/javascript:javascript_hdrs",
@@ -12,4 +15,10 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = ["@antlr4_runtime//:antlr4_runtime",
             "//src/base:base"]
+)
+
+cc_test(
+    name = "parser_unittest",
+    srcs = ["parser_unittest.cpp"],
+    deps = [":parser"],
 )
