@@ -2,7 +2,6 @@
 #define LANTR_PARSER_AST_PATTERN_MATCHING_MATCHABLE_H_
 
 #include <concepts>
-#include <algorithm>
 
 #include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
@@ -39,25 +38,6 @@ private:
   bool is_var_;
   T* bound_;
 };
-
-template<typename T>
-requires std::derived_from<T, Matchable<T>> &&
-         Base::TreeConcepts::NAryTree<T>
-[[nodiscard]]
-std::vector<Matchable<T>>
-PatternMatching(const T* tree,
-                const T* pattern) {
-  ASSERT(tree && pattern);
-
-  std::vector<Matchable<T>> matchs;
-
-  std::for_each(tree->begin(), tree->end(),
-                [&](T& t) {
-
-                });
-
-  return matchs;
-}
 
 } // LANTr::Parser::AST
 
