@@ -2,6 +2,7 @@
 #define LANTR_BASE_TREE_CONCEPTS_H_
 
 #include <concepts>
+#include <iterator>
 #include <ranges>
 #include <type_traits>
 #include <utility>
@@ -53,10 +54,19 @@ size_t NumOfChildren(T* tree) {
 //                               Tree Concepts                               //
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-concept NAryTree = requires(T& t) {
+concept NAryTree = requires (T& t) {
   { GetParent(&t) } -> std::convertible_to<T*>;
   { GetChildren(&t) } -> std::ranges::range;
 };
+
+template<typename T>
+concept NAryTreeIterator = std::forward_iterator<T> &&
+  requires (T& t) {
+    // Support to skip to iterate all descdent of current
+    // tree node.
+    { t.SkipSubTree() } -> std::same_as<T&>;
+  };
+
 
 } // LANTr::Base::TreeConcepts
 
