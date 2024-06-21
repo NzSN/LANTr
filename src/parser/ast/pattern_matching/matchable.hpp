@@ -2,9 +2,9 @@
 #define LANTR_PARSER_AST_PATTERN_MATCHING_MATCHABLE_H_
 
 #include <concepts>
-
-#include "base/tree_concepts.hpp"
-#include "base/utilities/assert.hpp"
+#include <functional>
+#include <optional>
+#include <type_traits>
 
 namespace LANTr::Parser::AST {
 
@@ -18,6 +18,8 @@ concept IsMatchable = requires(T& t, T& o) {
 template<typename T>
 class Matchable {
 public:
+  using Matcher = std::function<bool(const Matchable, const Matchable)>;
+
   Matchable(bool is_var = false): is_var_{is_var} {
     static_assert(IsMatchable<T>);
   }
@@ -32,6 +34,11 @@ public:
 
   void SetBound(T* bound) {
     bound_ = bound;
+  }
+
+  [[nodiscard]]
+  bool Equal(const Matchable& lhs, const Matchable& rhs) const {
+
   }
 
 private:

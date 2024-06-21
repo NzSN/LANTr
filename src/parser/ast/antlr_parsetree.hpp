@@ -11,6 +11,10 @@ using InternalTree = antlr4::tree::ParseTree;
 
 class AntlrTree: public Base::TreeLayer<AntlrTree, InternalTree>,
                  public Matchable<AntlrTree> {
+private:
+  using EqualFn = std::function<bool(const AntlrTree&, const AntlrTree&)>;
+
+  bool IsNodeValueEqual(const AntlrTree& tree, const AntlrTree& other) const;
 public:
   AntlrTree(InternalTree* tree): TreeLayer(this, tree) {}
 
