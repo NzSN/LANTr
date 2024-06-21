@@ -26,7 +26,12 @@ namespace {
 template<MatchAlgo Algo, typename T>
 requires (Algo == NAIVE)
 void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
+  auto current = tree.begin();
+  auto current_pattern = pattern.begin();
 
+  while (true) {
+    break;
+  }
 }
 
 }

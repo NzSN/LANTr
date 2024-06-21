@@ -1,6 +1,7 @@
 #ifndef LANTR_BASE_N_ARY_TREE_H_
 #define LANTR_BASE_N_ARY_TREE_H_
 
+#include <algorithm>
 #include <concepts>
 #include <memory>
 #include <vector>
@@ -69,6 +70,25 @@ public:
       auto iter = *this;
       this->operator++();
       return iter;
+    }
+
+    iterator& SkipSubTree() {
+      Tree<T>* tree = static_cast<Tree<T>*>(node_);
+
+      if (isEnd_) return *this;
+
+      if (accesses_.empty()) {
+        node_ = nullptr;
+        isEnd_ = true;
+      } else {
+        // It's impossible be the root of a Tree
+        // due to 'accesses_' is empty.
+        ASSERT(tree->parent_);
+        node_ = accesses_.back();
+        accesses_.pop_back();
+      }
+
+      return *this;
     }
 
     bool operator==(const iterator& other) const {

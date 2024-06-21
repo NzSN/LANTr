@@ -15,6 +15,7 @@ concept IsMatchable = requires(T& t, T& o) {
   { t.bound() } -> std::same_as<T*>;
 };
 
+// TODO: Rename Matchable to SigmaTerm is more apropriate.
 template<typename T>
 class Matchable {
 public:
@@ -22,6 +23,7 @@ public:
 
   Matchable(bool is_var = false): is_var_{is_var} {
     static_assert(IsMatchable<T>);
+    static_assert(std::derived_from<T, Matchable<T>>);
   }
 
   [[nodiscard]] bool IsVar() const {
@@ -37,8 +39,11 @@ public:
   }
 
   [[nodiscard]]
-  bool Equal(const Matchable& lhs, const Matchable& rhs) const {
-
+  bool operator==(const Matchable& other) const {
+    return static_cast<T*>(this)->operator==(
+      static_cast<const T&>(other))
+      /* Term Variable works as wildcard */
+      || is_var_;
   }
 
 private:
