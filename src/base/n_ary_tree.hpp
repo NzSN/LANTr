@@ -25,6 +25,7 @@ public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = T;
 
+    iterator() = default;
     iterator(T* node, bool isEnd = false):
      isEnd_{isEnd}, node_{node}  {
 
