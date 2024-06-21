@@ -5,6 +5,7 @@
 
 #include "parser/ast/pattern_matching/matchable.hpp"
 #include "base/tree_concepts.hpp"
+#include "base/utilities/assert.hpp"
 
 namespace LANTr::Parser::AST::PatternMatch {
 
@@ -25,11 +26,7 @@ namespace {
 template<MatchAlgo Algo, typename T>
 requires (Algo == NAIVE)
 void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
-  for (auto current = tree.begin();
-       current != tree.end(); ++current) {
 
-
-  }
 }
 
 }

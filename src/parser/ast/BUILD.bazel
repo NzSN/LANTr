@@ -8,6 +8,7 @@ filegroup(
     srcs = [":ast_hdrs",
             "antlr_parsetree.cpp",
             "pattern_matching/matchable.hpp",
+            "pattern_matching/pattern_matching.hpp",
             ],
     visibility = ["//visibility:public"]
 )
