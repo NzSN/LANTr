@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <concepts>
+#include <iterator>
 #include <memory>
 #include <vector>
 
@@ -19,7 +20,7 @@ public:
   using Children = std::vector<std::unique_ptr<T>>;
 
   // Iterate over a Tree in Pre-Order.
-  class iterator {
+  class iterator: public std::forward_iterator_tag {
   public:
 
     using difference_type = std::ptrdiff_t;
@@ -100,19 +101,11 @@ public:
       return !this->operator==(other);
     }
 
-    T& operator*() {
+    T& operator*() const {
       return *node_;
     }
 
-    const T& operator*() const {
-      return *node_;
-    }
-
-    T* operator->() {
-      return node_;
-    }
-
-    const T* operator->() const {
+    T* operator->() const {
       return node_;
     }
 
