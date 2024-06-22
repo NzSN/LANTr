@@ -8,12 +8,31 @@
 #define ASSERT(COND, MSG)
 #else
 
+#if __APPLE__
+#include <TargetConditionals.h>
+
+#if TARGET_OS_MAC
+
+#define ASSERT_FAILURE_MESSAGE(COND)              \
+  "Assertion failed with condition"               \
+  << #COND                                        \
+  << " at "                                       \
+  << std::string{__FILE__} + ":" + std::to_string(__LINE__)
+#endif
+
+#else
+
+#define ASSERT_FAILURE_MESSAGE(COND) \
+  std::format(                                              \
+    "Assertion failed with condition ({}) at {}:{} \n",     \
+    #COND, __FILE__, std::to_string(__LINE__))
+
+#endif
+
 #define ASSERT_WITHOUT_MSG(COND)                            \
   do {                                                      \
     if (!(COND)) {                                          \
-      std::cerr << std::format(                             \
-        "Assertion failed with condition ({}) at {}:{} \n", \
-        #COND, __FILE__, std::to_string(__LINE__));         \
+      std::cerr << ASSERT_FAILURE_MESSAGE(COND);            \
       std::abort();                                         \
     }                                                       \
   } while(0);
@@ -21,9 +40,7 @@
 #define ASSERT_WITH_MSG(COND, MSG)                \
   do {                                            \
     if (!(COND)) {                                \
-      std::cerr << std::format(                   \
-        "Assertion failed: {} at {}:{}\n",        \
-        MSG, __FILE__, std::to_string(__LINE__)); \
+      std::cerr << ASSERT_FAILURE_MESSAGE(COND);  \
       std::abort();                               \
     }                                             \
   } while (0);
