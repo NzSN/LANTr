@@ -152,9 +152,11 @@ public:
     return false;
   }
 
-  void AddChild(std::unique_ptr<T> child) {
+  auto& AddChild(std::unique_ptr<T> child) {
     child->SetParent(current_);
     children_.push_back(std::move(child));
+
+    return children_.back();
   }
 
   [[nodiscard]] bool HasChild() const {
