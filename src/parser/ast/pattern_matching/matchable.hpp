@@ -40,7 +40,7 @@ public:
 
   [[nodiscard]]
   bool operator==(const Matchable& other) const {
-    return static_cast<T*>(this)->operator==(
+    return static_cast<const T*>(this)->operator==(
       static_cast<const T&>(other))
       /* Term Variable works as wildcard */
       || is_var_;

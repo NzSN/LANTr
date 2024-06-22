@@ -17,6 +17,7 @@ cc_test(
     name = "ast_unittest",
     srcs = [":ast",
             "antlr_parsetree_unittest.cpp",
+            "pattern_matching/pattern_matching_unittest.cpp",
             "//src/parser/languages:languages_srcs",
             ],
     deps = ["@antlr4_runtime//:antlr4_runtime",

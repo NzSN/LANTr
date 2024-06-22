@@ -20,7 +20,7 @@ enum MatchAlgo {
 //                           Naive Pattern Matching                          //
 ///////////////////////////////////////////////////////////////////////////////
 template<typename T>
-using MatchResult = std::vector<Matchable<T>*>;
+using MatchResult = std::vector<const T*>;
 
 namespace {
 
@@ -50,7 +50,7 @@ void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
     }
 
     next_iter(static_cast<Matchable<T>*>(
-                *(current_pattern))->IsVar());
+                &(*current_pattern))->IsVar());
   }
 
   result.push_back(&tree);
@@ -64,12 +64,12 @@ requires std::derived_from<T, Matchable<T>> &&
          Base::TreeConcepts::NAryTreeIterator<typename T::iterator> &&
          (Algo == NAIVE)
 [[nodiscard]]
-std::vector<Matchable<T>>
+MatchResult<T>
 Matching(const T* tree,
          const T* pattern) {
   ASSERT(tree && pattern);
 
-  std::vector<Matchable<T>> matchs;
+  MatchResult<T> matchs;
 
   std::for_each(tree->begin(), tree->end(),
                 [&](T& t) {
