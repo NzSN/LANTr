@@ -91,7 +91,7 @@ struct PatternMatchTester: public ::testing::Test {};
 
 RC_GTEST_FIXTURE_PROP(PatternMatchTester, SimpleMatch, ()) {
   NumericTree
-    tree_1{ {1,2,3}, {3,2,1} },
+    tree_1 { {1,2,3}, {3,2,1} },
     tree_2 { {1,2,3}, {2,1,3} },
     tree_3 { {1,2,3}, {3,2,1} };
 
