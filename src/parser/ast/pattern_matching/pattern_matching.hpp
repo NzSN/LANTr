@@ -44,16 +44,28 @@ void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
   };
 
   while (current_pattern != pattern.end()) {
+
+    bool isVar = static_cast<Matchable<T>*>(
+      &(*current_pattern))->IsVar();
+
+    if (current == tree.end() ||
+        (!isVar &&
+         Base::TreeConcepts::NumOfChildren(&(*current_pattern)) !=
+         Base::TreeConcepts::NumOfChildren(&(*current)))) {
+      return;
+    }
+
     if (!current->Matchable<T>::operator==(
           *current_pattern)) {
       return;
     }
 
-    next_iter(static_cast<Matchable<T>*>(
-                &(*current_pattern))->IsVar());
+    next_iter(isVar);
   }
 
-  result.push_back(&tree);
+  if (current_pattern == pattern.end() &&
+      current == tree.end())
+    result.push_back(&tree);
 }
 
 }

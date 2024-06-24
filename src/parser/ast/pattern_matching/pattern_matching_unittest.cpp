@@ -79,7 +79,6 @@ struct NumericTree: public Base::Tree<NumericTree>,
         }, nums);
       }
     }
-
   }
 
   NumericTree(std::initializer_list<NumOrNums> list):
@@ -96,25 +95,73 @@ struct NumericTree: public Base::Tree<NumericTree>,
 struct PatternMatchTester: public ::testing::Test {};
 
 RC_GTEST_FIXTURE_PROP(PatternMatchTester, SimpleMatch, ()) {
-  NumericTree
-    tree_1 { {1,2,3}, {3,2,1} },
-    tree_2 { {1,2,3}, {2,1,3} },
-    tree_3 { {1,2,3}, {3,2,1} };
 
-  MatchResult<NumericTree> r1 = Matching(&tree_1, &tree_2);
-  RC_ASSERT(r1.size() == 0);
+  { // Base Case
+    NumericTree tree_1{}, tree_2{}, tree_3{{1}};
 
-  MatchResult<NumericTree> r2 = Matching(&tree_1, &tree_3);
-  RC_ASSERT(r2.size() == 1);
+    RC_ASSERT(Matching(&tree_1, &tree_2).size() == 1);
+    RC_ASSERT(Matching(&tree_1, &tree_3).size() == 0);
+    RC_ASSERT(Matching(&tree_3, &tree_1).size() == 0);
+  }
+
+  {
+    NumericTree
+      tree_1 { {1,2,3}, {3,2,1} },
+      tree_2 { {1,2,3}, {2,1,3} },
+      tree_3 { {1,2,3}, {3,2,1} };
+
+    MatchResult<NumericTree> r1 = Matching(&tree_1, &tree_2);
+    RC_ASSERT(r1.size() == 0);
+
+    MatchResult<NumericTree> r2 = Matching(&tree_1, &tree_3);
+    RC_ASSERT(r2.size() == 1);
+  }
 }
 
 RC_GTEST_FIXTURE_PROP(PatternMatchTester, MatchWithVar, ()) {
-  NumericTree
-    tree_1 { {1}, {2} },
-    tree_2 { {0}, {0} } /* 0 treat as Term Variable */;
+  {
+    NumericTree
+      tree_1 { {1}, {2} },
+      tree_2 { {0}, {0} } /* 0 treat as Term Variable */;
 
-  MatchResult<NumericTree> r1 = Matching(&tree_1, &tree_2);
-  RC_ASSERT(r1.size() == 1);
+    MatchResult<NumericTree> r1 = Matching(&tree_1, &tree_2);
+    RC_ASSERT(r1.size() == 1);
+  }
+
+  {
+    NumericTree
+      pattern { {0, 0}, {0, 0} },
+      tree { { _{1, 2}, _{7, 8} }, { _{3, 4}, _{5, 6} } };
+
+    MatchResult<NumericTree> r1 = Matching(&tree, &pattern);
+    RC_ASSERT(r1.size() == 3);
+    RC_ASSERT(r1[0]->Parent() == nullptr);
+    RC_ASSERT(r1[1]->Parent() == r1[0] &&
+              r1[2]->Parent() == r1[0]);
+  }
+
+  {
+    NumericTree tree{ { { { 1 } } } };
+
+    {
+      NumericTree pattern{1};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 1);
+      RC_ASSERT(r[0]->numericNode && r[0]->num == 1);
+    }
+
+    {
+      NumericTree pattern{_{_{_{_{_{}}}}}};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 0);
+    }
+
+    {
+      NumericTree pattern{{{{1}}}};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 1);
+    }
+  }
 }
 
 
