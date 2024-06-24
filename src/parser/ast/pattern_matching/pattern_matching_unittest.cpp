@@ -101,6 +101,7 @@ RC_GTEST_FIXTURE_PROP(PatternMatchTester, SimpleMatch, ()) {
 
     RC_ASSERT(Matching(&tree_1, &tree_2).size() == 1);
     RC_ASSERT(Matching(&tree_1, &tree_3).size() == 0);
+    RC_ASSERT(Matching(&tree_3, &tree_1).size() == 0);
   }
 
   {
