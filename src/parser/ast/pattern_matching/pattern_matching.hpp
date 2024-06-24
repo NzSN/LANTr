@@ -63,7 +63,9 @@ void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
     next_iter(isVar);
   }
 
-  result.push_back(&tree);
+  if (current_pattern == pattern.end() &&
+      current == tree.end())
+    result.push_back(&tree);
 }
 
 }

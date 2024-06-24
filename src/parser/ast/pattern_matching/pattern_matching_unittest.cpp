@@ -141,12 +141,26 @@ RC_GTEST_FIXTURE_PROP(PatternMatchTester, MatchWithVar, ()) {
   }
 
   {
-    NumericTree tree{ { { { 1 } } } },
-      pattern{1};
+    NumericTree tree{ { { { 1 } } } };
 
-    MatchResult<NumericTree> r = Matching(&tree, &pattern);
-    RC_ASSERT(r.size() == 1);
-    RC_ASSERT(r[0]->numericNode && r[0]->num == 1);
+    {
+      NumericTree pattern{1};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 1);
+      RC_ASSERT(r[0]->numericNode && r[0]->num == 1);
+    }
+
+    {
+      NumericTree pattern{_{_{_{_{_{}}}}}};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 0);
+    }
+
+    {
+      NumericTree pattern{{{{1}}}};
+      MatchResult<NumericTree> r = Matching(&tree, &pattern);
+      RC_ASSERT(r.size() == 1);
+    }
   }
 }
 
