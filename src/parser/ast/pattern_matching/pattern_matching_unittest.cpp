@@ -53,7 +53,13 @@ struct NumOrNums {
 struct NumericTree: public Base::Tree<NumericTree>,
                     public Matchable<NumericTree> {
   NumericTree(): Tree(this), numericNode{false}, num{} {}
-  NumericTree(int num_): Tree(this), numericNode{true}, num{num_} {}
+  NumericTree(int num_): Tree(this), numericNode{true}, num{num_} {
+    if (num_ == 0) {
+      AsVar();
+    } else {
+      AsNonVar();
+    }
+  }
 
   NumericTree(std::vector<NumOrNums> list):
     Tree(this), numericNode(false), num{} {
@@ -100,6 +106,15 @@ RC_GTEST_FIXTURE_PROP(PatternMatchTester, SimpleMatch, ()) {
 
   MatchResult<NumericTree> r2 = Matching(&tree_1, &tree_3);
   RC_ASSERT(r2.size() == 1);
+}
+
+RC_GTEST_FIXTURE_PROP(PatternMatchTester, MatchWithVar, ()) {
+  NumericTree
+    tree_1 { {1}, {2} },
+    tree_2 { {0}, {0} } /* 0 treat as Term Variable */;
+
+  MatchResult<NumericTree> r1 = Matching(&tree_1, &tree_2);
+  RC_ASSERT(r1.size() == 1);
 }
 
 

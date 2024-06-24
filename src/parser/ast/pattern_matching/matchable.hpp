@@ -30,6 +30,14 @@ public:
     return is_var_;
   }
 
+  void AsVar() {
+    is_var_ = true;
+  }
+
+  void AsNonVar() {
+    is_var_ = false;
+  }
+
   [[nodiscard]] T* bound() {
     return bound_;
   }
@@ -43,7 +51,8 @@ public:
     return static_cast<const T*>(this)->operator==(
       static_cast<const T&>(other))
       /* Term Variable works as wildcard */
-      || is_var_;
+      || is_var_
+      || other.is_var_;
   }
 
 private:
