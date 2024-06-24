@@ -130,7 +130,7 @@ RC_GTEST_FIXTURE_PROP(PatternMatchTester, MatchWithVar, ()) {
   {
     NumericTree
       pattern { {0, 0}, {0, 0} },
-      tree { { _{1, 2}, _{7,8} }, { _{3, 4}, _{5, 6} } };
+      tree { { _{1, 2}, _{7, 8} }, { _{3, 4}, _{5, 6} } };
 
     MatchResult<NumericTree> r1 = Matching(&tree, &pattern);
     RC_ASSERT(r1.size() == 3);
