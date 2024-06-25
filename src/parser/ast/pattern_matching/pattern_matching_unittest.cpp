@@ -92,7 +92,35 @@ struct NumericTree: public Base::Tree<NumericTree>,
   const int num;
 };
 
-struct PatternMatchTester: public ::testing::Test {};
+// TODO: Implement helper functions in PatternMatchTester.
+struct PatternMatchTester: public ::testing::Test {
+
+  NumericTree* TreeAssemble(NumericTree& tree,
+                            NumericTree& pattern) {
+    return nullptr;
+  }
+
+  bool MatchWithVarIgnored(const NumericTree& tree_l,
+                           const NumericTree& tree_r) {
+    return true;
+  }
+
+  // There is no ways to assert that there are some
+  // subtree should be matched but actually not.
+  bool IsActuallyMatch(MatchResult<NumericTree>& tree,
+                       NumericTree& pattern) {
+
+    for (auto match: tree) {
+      NumericTree* tree = TreeAssemble(
+        const_cast<NumericTree&>(*match), pattern);
+      if (!MatchWithVarIgnored(*match, *tree)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+};
 
 RC_GTEST_FIXTURE_PROP(PatternMatchTester, SimpleMatch, ()) {
 
