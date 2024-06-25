@@ -70,6 +70,12 @@ void Stepping(MatchResult<T>& result, const T& tree, const T& pattern) {
 
 }
 
+// TODO: The type of second argument should be something like
+//       'Pattern<T>' to identifying argument as Pattern explicit in
+//       type system.
+//
+//       Type of Matching should be:
+//       Matching :: T -> Pattern<T> -> Bool
 template<MatchAlgo Algo = NAIVE, typename T>
 requires std::derived_from<T, Matchable<T>> &&
          Base::TreeConcepts::NAryTree<T> &&
