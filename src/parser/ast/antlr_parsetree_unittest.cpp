@@ -24,7 +24,7 @@ bool equivalent(LANGUAGE::TreeType<LANGUAGE::ANTLR4>::type* ltree,
 
   auto iter = ltree->children.cbegin();
   for (auto const& c: rtree->GetChildren()) {
-    ASSERT(iter < ltree->children.cend(), "out of range");
+    ASSERTM("out of range", iter < ltree->children.cend());
 
     const InternalTree* internalTree = c->GetInternal();
     if (internalTree != *iter) {

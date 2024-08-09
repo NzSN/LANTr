@@ -32,9 +32,9 @@ public:
      isEnd_{isEnd}, node_{node}  {
 
       node_ = isEnd_ ? nullptr : node_;
-      ASSERT((!isEnd_ && node_ != nullptr) ||
-             (isEnd && node_ == nullptr),
-             "Iterate over a memory area pointed by nullptr");
+      ASSERTM("Iterate over a memory area pointed by nullptr",
+              (!isEnd_ && node_ != nullptr) ||
+              (isEnd && node_ == nullptr));
     }
 
     // Pre-Order Traversal.

@@ -22,10 +22,7 @@ public:
 
   RewriteRule(std::initializer_list<std::string> args) {
     ASSERT(args.size() > num_of_minimum_components ||
-           args.size() < num_of_maximum_components,
-           "Init a rule with " + std::to_string(args.size()) + " components is not allowed."
-           + " Rewrite rule consist of at most of three components "
-           "or at least two components.");
+           args.size() < num_of_maximum_components);
 
     auto iter = args.begin();
     sPattern_ = *(iter);

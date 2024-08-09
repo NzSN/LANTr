@@ -22,7 +22,7 @@ public:
   }
 
   static std::unique_ptr<U> BuildFrom(L* lower) {
-    ASSERT(lower != nullptr, "BuildFrom nullptr");
+    ASSERTM("BuildFrom nullptr", lower != nullptr);
 
     auto root = std::make_unique<U>(lower);
     for (auto& c: TreeConcepts::GetChildren(lower)) {
@@ -183,12 +183,12 @@ private:
                   std::bind(&TreeLayer::CorrectStep,
                             this, std::placeholders::_1));
 
-    ASSERT_SLOW(std::find_if(
-                  this->begin(), this->end(),
-                  [](TreeLayer& layer) -> bool{
-                    return layer.state_ != VALID;
-                  }) == this->end(),
-                "Some nodes still in invalid state after correct");
+    ASSERTM_SLOW("Some nodes still in invalid state after correct",
+                 std::find_if(
+                   this->begin(), this->end(),
+                   [](TreeLayer& layer) -> bool{
+                     return layer.state_ != VALID;
+                   }) == this->end());
   }
 
   void Stepping(TreeLayer* node) {
@@ -225,13 +225,13 @@ private:
       work_list_.pop();
     }
 
-    ASSERT(work_list_.empty(),
-           "Work list should be empty at end of invalidate algorithm");
+    ASSERTM("Work list should be empty at end of invalidate algorithm",
+            work_list_.empty());
   }
 
   void UpdateInvalidateState() {
-    ASSERT(work_list_.empty(),
-           "Work list should be empty at initial of invalidate");
+    ASSERTM("Work list should be empty at initial of invalidate",
+            work_list_.empty());
 
     // Use the node pointed by argument as root node
     // to process invalidate.

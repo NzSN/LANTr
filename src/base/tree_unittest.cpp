@@ -105,10 +105,10 @@ struct TreeLayerTester: public ::testing::Test {
     for (auto& node: *upper) {
         if (count == indexL || count == indexR) {
           if (from == nullptr) {
-            ASSERT(to == nullptr, "'to' should not be setted before 'from'");
+            ASSERTM("'to' should not be setted before 'from'", to == nullptr);
             from = &node;
           } else {
-            ASSERT(from != nullptr, "'to' should not be setted before 'from'");
+            ASSERTM("'to' should not be setted before 'from'", from != nullptr);
             to = &node;
 
             std::swap(from->lower_, to->lower_);
@@ -168,9 +168,9 @@ struct TreeLayerTester: public ::testing::Test {
       }
 
       auto invalids = invalids_opt.value();
-      ASSERT(std::get<0>(invalids) != nullptr &&
-             std::get<1>(invalids) != nullptr,
-             "invalidate a nullptr is impossible");
+      ASSERTM("invalidate a nullptr is impossible",
+             std::get<0>(invalids) != nullptr &&
+             std::get<1>(invalids) != nullptr);
       invalidatedNodes.push_back(std::get<0>(invalids));
       invalidatedNodes.push_back(std::get<1>(invalids));
 

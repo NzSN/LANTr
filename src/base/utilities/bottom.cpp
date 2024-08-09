@@ -8,9 +8,9 @@ namespace Bottom {
 
 
 void Unreachable(Reason reason) {
-  ASSERT(reason >= Reason::FIRST_REASON &&
-         reason < Reason::END_OF_REASON,
-         "Not recognized reason");
+  ASSERTM("Not recognized reason",
+         reason >= Reason::FIRST_REASON &&
+         reason < Reason::END_OF_REASON);
 
   throw ReachBottom(reason);
 }
