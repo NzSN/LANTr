@@ -1,6 +1,7 @@
 #ifndef LANTR_TRANSFORMER_STRATEGY_H_
 #define LANTR_TRANSFORMER_STRATEGY_H_
 
+#include "base/types.hpp"
 #include "parser/ast/abst_parsetree.hpp"
 #include "rule.hpp"
 #include "parser/languages/language_definitions.hpp"
@@ -19,6 +20,7 @@ public:
 
   Strategy(Rule<lang>& rule): rule_{rule} {}
 
+  virtual void operator()(Base::Types::Source source) = 0;
   virtual void operator()(AST::AbstTree<Tree>& tree) = 0;
 private:
   Rule<lang>& rule_;
@@ -31,6 +33,10 @@ template<LANGS::LANGUAGE lang>
 class MatchStrategy: public Strategy<lang> {
 public:
   MatchStrategy(Rule<lang>& rule): Strategy<lang>{rule} {}
+
+  void operator()(Base::Types::Source source) {
+
+  }
 
   void operator()(AST::AbstTree<typename Strategy<lang>::Tree>& tree) {
 
