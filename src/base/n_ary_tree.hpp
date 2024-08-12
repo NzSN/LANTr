@@ -9,7 +9,6 @@
 
 #include "base/tree_concepts.hpp"
 #include "base/utilities/assert.hpp"
-#include "base/utilities/bottom.hpp"
 
 
 namespace LANTr::Base {

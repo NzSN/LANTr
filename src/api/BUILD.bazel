@@ -1,11 +1,11 @@
 filegroup(
     name = "api",
     srcs = [
-         # LANTr
-         "lantr.hpp",
-         # RewriteRule
-         "rule.hpp"
-         ],
+        # LANTr
+        "lantr.hpp",
+        # RewriteRule
+        "rule.hpp"
+    ],
     visibility = ["//visibility:public"],
 )
 
@@ -17,13 +17,13 @@ filegroup(
 cc_test(
     name = "api_test",
     srcs = [
-         ":api",
-         ":api_tests"
-         ],
+        ":api",
+        ":api_tests"
+    ],
     deps = [
-         "@com_google_googletest//:gtest_main",
-         "@rapidcheck//:rapidcheck",
-         "//src/base:base",
-         "//src/parser:parser"
-         ]
+        "@com_google_googletest//:gtest_main",
+        "@rapidcheck//:rapidcheck",
+        "//src/base:base",
+        "//src/parser:parser"
+    ]
 )

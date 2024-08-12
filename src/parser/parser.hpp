@@ -3,7 +3,7 @@
 
 #include "base/tree_layer.hpp"
 #include "base/types.hpp"
-#include "parser/ast/antlr_parsetree.hpp"
+#include "parser/ast/abst_parsetree.hpp"
 #include "parser/languages/language_definitions.hpp"
 #include "parser/languages/language_impl.hpp"
 

@@ -1,12 +1,12 @@
 filegroup(
     name = "ast_hdrs",
-    srcs = ["antlr_parsetree.hpp"],
+    srcs = ["abst_parsetree.hpp"],
     visibility = ["//visibility:public"],
 )
 filegroup(
     name = "ast",
     srcs = [":ast_hdrs",
-            "antlr_parsetree.cpp",
+            "abst_parsetree.cpp",
             "pattern_matching/matchable.hpp",
             "pattern_matching/pattern_matching.hpp",
             ],
@@ -16,7 +16,7 @@ filegroup(
 cc_test(
     name = "ast_unittest",
     srcs = [":ast",
-            "antlr_parsetree_unittest.cpp",
+            "abst_parsetree_unittest.cpp",
             "pattern_matching/pattern_matching_unittest.cpp",
             "//src/parser/languages:languages_srcs",
             ],

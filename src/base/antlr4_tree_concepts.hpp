@@ -6,22 +6,22 @@
 #include <vector>
 
 template<typename T>
-concept AntlrTree = requires(T& t) {
+concept AbstTree = requires(T& t) {
   { t.parent } -> std::convertible_to<T*>;
   { t.children } -> std::ranges::range;
 };
 
-template<AntlrTree T>
+template<AbstTree T>
 auto GetChildren(T* tree) -> decltype(std::vector<T*>{}) & {
   return tree->children;
 }
 
-template<AntlrTree T>
+template<AbstTree T>
 T* GetParent(T* tree) {
   return tree->parent;
 }
 
-template<AntlrTree T>
+template<AbstTree T>
 size_t NumOfChildren(T* tree) {
   return GetChildren(tree).size();
 }

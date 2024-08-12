@@ -19,7 +19,7 @@ namespace LANTr::Parser::LANGUAGE {
   V(TYPESCRIPT, ANTLR4, antlr4::tree::ParseTree, TypeScriptLexer, TypeScriptParser)    \
   V(ARITH, ANTLR4, antlr4::tree::ParseTree, ArithLexer, ArithParser)
 
-#define LANG_ANTLR4_ENTRY_LIST(V) \
+#define LANG_ANTLR4_ENTRY_LIST(V)                     \
   V(JAVASCRIPT, program, JavaScriptParser)            \
   V(TYPESCRIPT, program, TypeScriptParser)            \
   V(ARITH, prog, ArithParser)
@@ -46,6 +46,8 @@ template<>
 struct TreeType<ANTLR4> {
   using type = antlr4::tree::ParseTree;
 };
+template<LANG_IMPL LI>
+using TreeType_t = TreeType<LI>::type;
 
 template<LANGUAGE L>
 struct LangLexer;
@@ -65,6 +67,11 @@ struct LangParser;
 LANG_LIST(LANG_INFORMATION_DEFINE)
 #undef LANG_INFORMATION_DEFINE
 
+template<LANGUAGE L>
+using LangLexer_t = LangLexer<L>::type;
+template<LANGUAGE L>
+using LangParser_t = LangParser<L>::type;
+
 // Impl mapping
 template<LANGUAGE L>
 struct ImplOfLang;
@@ -76,6 +83,10 @@ struct ImplOfLang;
   };
 LANG_LIST(IMPL_MAPPING)
 #undef IMPL_MAPPING
+
+template<LANGUAGE L>
+inline constexpr LANG_IMPL ImplOfLang_v = ImplOfLang<L>::impl;
+
 // Antlr4 Entry
 template<LANGUAGE L>
 struct Antlr4Entry;

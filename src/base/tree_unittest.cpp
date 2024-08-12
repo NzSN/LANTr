@@ -2,12 +2,10 @@
 #include <optional>
 #include <rapidcheck/gtest.h>
 
-#include <variant>
 #include <algorithm>
 
 #include "base/utilities/assert.hpp"
 #include "test_utility.hpp"
-#include "base/utilities/bottom.hpp"
 #include "base/n_ary_tree.hpp"
 #include "base/tree_layer.hpp"
 
@@ -92,7 +90,6 @@ struct Upper: public TreeLayer<Upper,Lower> {
   Upper(Lower* lower): TreeLayer{this, lower} {}
 };
 
-using Layers = std::variant<Upper, Lower>;
 
 struct TreeLayerTester: public ::testing::Test {
 
