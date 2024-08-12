@@ -2,6 +2,8 @@
 #define LANTR_PARSER_LANGUAGES_H_
 
 #include <memory>
+#include <sstream>
+#include <stdexcept>
 
 #include "antlr4-runtime.h"
 
@@ -15,14 +17,29 @@ struct ParseResult;
 
 template<LANGUAGE L>
 struct ParseResult {
-  TreeType<ANTLR4>::type* tree;
+  ParseResult(Base::Types::Source source):
+    input_stream_{source},
+    input_{std::make_unique<antlr4::ANTLRInputStream>(input_stream_)},
+    lexer_{std::make_unique<typename LangLexer<L>::type>(input_.get())},
+    tokens_{std::make_unique<antlr4::CommonTokenStream>(lexer_.get())},
+    parser_{std::make_unique<typename LangParser<L>::type>(tokens_.get())},
+    tree{Antlr4Entry<L>::GetEntry(*parser_)}
+    {}
 
+  bool HasErrors() const {
+    return parser_->getNumberOfSyntaxErrors() > 0;
+  }
+
+private:
   // Caution: following resources is required to be lived otherwise
   //          tree is deaded.
-  std::unique_ptr<antlr4::ANTLRInputStream> input;
-  std::unique_ptr<antlr4::CommonTokenStream> tokens;
-  std::unique_ptr<typename LangLexer<L>::type> lexer;
-  std::unique_ptr<typename LangParser<L>::type> parser;
+  std::istringstream input_stream_;
+  std::unique_ptr<antlr4::ANTLRInputStream> input_;
+  std::unique_ptr<typename LangLexer<L>::type> lexer_;
+  std::unique_ptr<antlr4::CommonTokenStream> tokens_;
+  std::unique_ptr<typename LangParser<L>::type> parser_;
+public:
+  TreeType<ANTLR4>::type* tree;
 };
 
 class ParserImpl {
@@ -37,20 +54,8 @@ requires CanParsedBy<L, ANTLR4>
 ParseResult<L>
 ParserImpl::Parse(Base::Types::Source source) {
   std::istringstream iss{source};
-
-  ParseResult<L> result;
-  result.input = std::make_unique<antlr4::ANTLRInputStream>(iss);
-  result.lexer = std::make_unique<typename LangLexer<L>::type>(
-    result.input.get());
-  result.tokens = std::make_unique<antlr4::CommonTokenStream>(
-    result.lexer.get());
-  result.parser = std::make_unique<typename LangParser<L>::type>(
-    result.tokens.get());
-  result.tree = Antlr4Entry<L>::GetEntry(*result.parser);
-
-  return result;
+  return ParseResult<L>{source};
 }
-
 
 } // LANTr::Parser::LANGUAGE
 
