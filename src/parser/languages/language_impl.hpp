@@ -26,11 +26,6 @@ struct ParseResult {
     tree{Antlr4Entry<L>::GetEntry(*parser_)}
     {}
 
-  bool HasErrors() const {
-    return parser_->getNumberOfSyntaxErrors() > 0;
-  }
-
-private:
   // Caution: following resources is required to be lived otherwise
   //          tree is deaded.
   std::istringstream input_stream_;
@@ -38,7 +33,6 @@ private:
   std::unique_ptr<typename LangLexer<L>::type> lexer_;
   std::unique_ptr<antlr4::CommonTokenStream> tokens_;
   std::unique_ptr<typename LangParser<L>::type> parser_;
-public:
   TreeType<ANTLR4>::type* tree;
 };
 

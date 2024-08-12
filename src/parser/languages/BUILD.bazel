@@ -2,7 +2,6 @@ filegroup(
     name = "languages_srcs",
     srcs = ["language.hpp",
             "language_definitions.hpp",
-            "language_impl_unittest.cpp",
             "language_impl.hpp",
             "language_impl.cpp",
             "//src/parser/languages/javascript:javascript_parser",
@@ -25,7 +24,8 @@ filegroup(
 
 cc_test(
     name = "languages_unittest",
-    srcs = [":languages_srcs"],
+    srcs = [":languages_srcs",
+            "language_impl_unittest.cpp"],
     deps = [
          "@com_google_googletest//:gtest_main",
          "@rapidcheck//:rapidcheck",

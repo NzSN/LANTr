@@ -19,6 +19,11 @@ public:
     result_{std::move(r)},
     tree_{Info::Tree::BuildFrom(result_.tree)},
     tree{tree_.get()} {}
+
+  bool HasErrors() const {
+    return result_.parser_->getNumberOfSyntaxErrors() > 0;
+  }
+
 private:
   LANGUAGE::ParseResult<L> result_;
   std::unique_ptr<typename Info::Tree> tree_;

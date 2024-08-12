@@ -14,7 +14,7 @@ filegroup(
 )
 
 cc_test(
-    name = "transformer-unittest",
+    name = "transformer_unittest",
     srcs = [":transformer-srcs",
             "strategy_unittest.cpp"],
     deps = [

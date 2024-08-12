@@ -22,13 +22,12 @@ class Rule {
 public:
   using LangImpl = LANGS::ImplOfLang<lang>;
   using TreeType = LANGS::TreeType<LangImpl::impl>;
-  using Tree     = Base::Tree<typename TreeType::type>;
-  using AbstTree = Parser::AST::AbstTree<Tree>;
+  using Tree     = typename TreeType::type;
 
   Rule(Types::Source source_, Types::Source target_):
     source{source_}, target{target_},
     env_{([&] {
-      LANGS::ParseResult<lang> result =
+      Parser::ParseResult<lang> result =
         Parser::Parser<lang>::Parse(source);
       if (result.HasErrors()) {
         throw std::runtime_error("Failed to parse source pattern");
@@ -36,8 +35,11 @@ public:
 
       return result;
     })()},
-    source_tree{Base::TreeLayer<AbstTree, Tree>::BuildFrom(env_.tree)}
-    {}
+    source_tree{env_.tree}
+
+    {
+      ASSERT(source_tree != nullptr);
+    }
 
   /* Only when transfrom between the same language */
   [[nodiscard]]
@@ -60,7 +62,7 @@ private:
   /* Only Tree of source pattern is generated due to
    * target may use as template to generate lang that
    * different from source lang. */
-  std::unique_ptr<AbstTree> source_tree;
+  Parser::AST::AbstTree<Tree>* source_tree;
 };
 
 } // LANTr::Trans::Strategy
