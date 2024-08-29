@@ -3,11 +3,14 @@
 
 #include "base/types.hpp"
 #include "parser/ast/abst_parsetree.hpp"
+#include "parser/ast/pattern_matching/pattern_matching.hpp"
 #include "rule.hpp"
 #include "parser/languages/language_definitions.hpp"
 
-namespace LANGS = ::LANTr::Parser::LANGUAGE;
-namespace AST = ::LANTr::Parser::AST;
+namespace P = ::LANTr::Parser;
+namespace LANGS = P::LANGUAGE;
+namespace AST = P::AST;
+namespace PM = P::AST::PatternMatch;
 
 namespace LANTr::Transformer {
 
@@ -17,12 +20,13 @@ public:
   using LangImpl = LANGS::ImplOfLang<lang>;
   using TreeType = LANGS::TreeType<LangImpl::impl>;
   using Tree     = Base::Tree<typename TreeType::type>;
+  using AbstTree = AST::AbstTree<Tree>;
 
   Strategy(Rule<lang>& rule): rule_{rule} {}
 
   virtual void operator()(Base::Types::Source source) = 0;
-  virtual void operator()(AST::AbstTree<Tree>& tree) = 0;
-private:
+  virtual void operator()(AbstTree& tree) = 0;
+protected:
   Rule<lang>& rule_;
 };
 
@@ -32,13 +36,18 @@ private:
 template<LANGS::LANGUAGE lang>
 class MatchStrategy: public Strategy<lang> {
 public:
+  using AbstTree = typename Strategy<lang>::AbstTree;
+
   MatchStrategy(Rule<lang>& rule): Strategy<lang>{rule} {}
 
-  void operator()(Base::Types::Source source) {
-
+  void operator()(Base::Types::Source source) override {
+    auto parseInfo = P::Parser<lang>::Parse(source);
+    this->operator()(parseInfo.tree);
   }
 
-  void operator()(AST::AbstTree<typename Strategy<lang>::Tree>& tree) {
+  void operator()(AbstTree& tree) override {
+    PM::MatchResult<AbstTree> result =
+      Parser::AST::PatternMatch::Matching(tree, this->rule_.GetSourceTree());
 
   }
 };

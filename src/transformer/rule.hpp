@@ -53,6 +53,22 @@ public:
     return result;
   }
 
+  [[nodiscard]]
+  const Parser::AST::AbstTree<Tree>*
+  GetSourceTree() const {
+    return source_tree;
+  }
+
+  const Types::Source&
+  GetSource() const {
+    return source;
+  }
+
+  const Types::Source
+  GetTarget() const {
+    return target;
+  }
+
 private:
   Types::Source source;
   Types::Source target;

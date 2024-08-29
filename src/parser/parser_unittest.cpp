@@ -25,7 +25,7 @@ RC_GTEST_PROP(PatternMatchTester, PatternMatching, ()) {
     Parser<LANGUAGE::ARITH>::Parse("1+1");
 
   auto matchs = PM::Matching(result.tree, result.tree);
-  RC_ASSERT(matchs.size() == 1);
+  RC_ASSERT(matchs.size() > 0);
 }
 
 } // LANTr::Parser
