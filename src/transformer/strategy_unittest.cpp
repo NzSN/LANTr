@@ -11,8 +11,8 @@ TEST(StrategyTester, Spec) {
   Rule<Parser::LANGUAGE::ARITH> rule{"1+1", "2+2"};
   MatchStra<Parser::LANGUAGE::ARITH> matcher{rule};
 
-  //matcher("1+1");
-
+  matcher.BindProgram("1+1");
+  matcher();
 }
 
 

@@ -4,6 +4,7 @@
 #include "base/types.hpp"
 #include "parser/ast/abst_parsetree.hpp"
 #include "parser/ast/pattern_matching/pattern_matching.hpp"
+#include "parser/parser.hpp"
 #include "rule.hpp"
 #include "parser/languages/language_definitions.hpp"
 #include <algorithm>
@@ -40,13 +41,16 @@ requires(
   T& t,
   Base::Types::Source s) {
 
-  { t(s) } -> std::same_as<void>;
   { t() } -> std::same_as<void>;
 };
 
 template<LANGS::LANGUAGE lang>
 struct StraBase {
   StraBase(Rule<lang>& rule): rule_{rule} {}
+  void BindProgram(Base::Types::Source s) {
+    Parser::ParseResult<lang> result = Parser::Parser<lang>::Parse(s);
+    this->rule_.runtime_ctx.Bind(std::move(result));
+  }
 protected:
   Rule<lang>& rule_;
 };
@@ -60,10 +64,6 @@ public:
   MatchStra(Rule<lang>& rule):
     StraBase<lang>{rule} {
     static_assert(Strategy<MatchStra>);
-  }
-
-  void operator()(Base::Types::Source s) {
-
   }
 
   void operator()() {
@@ -82,10 +82,6 @@ public:
     static_assert(Strategy<WhereStra>);
   }
 
-  void operator()(Base::Types::Source source) {
-
-  }
-
   void operator()() {
 
   }
@@ -96,10 +92,6 @@ class BuildStra: public StraBase<lang> {
 public:
   BuildStra(Rule<lang>& rule): StraBase<lang>{rule} {
     static_assert(Strategy<BuildStra>);
-  }
-
-  void operator()(Base::Types::Source source) {
-
   }
 
   void operator()() {
@@ -129,15 +121,29 @@ struct FirstOrderStra: public StraBase<lang> {
     #endif
   }
 
-  void operator()(Base::Types::Source source) {
-
-  }
-
   void operator()() {
     std::for_each(
       stras.begin(), stras.end(),
-      [](FirstOrderStra_t<lang>& stra) {
-
+      [&](FirstOrderStra_t<lang>& stra) {
+        switch (this->rule_.runtime_ctx.state) {
+        case Rule<lang>::RuntimeContext::State::MATCH: {
+          auto s = std::get<MatchStra<lang>>(stra);
+          s();
+          break;
+        }
+        case Rule<lang>::RuntimeContext::State::WHERE: {
+          auto s = std::get<WhereStra<lang>>(stra);
+          s();
+          break;
+        }
+        case Rule<lang>::RuntimeContext::State::BUILD: {
+          auto s = std::get<BuildStra<lang>>(stra);
+          s();
+          break;
+        }
+        case Rule<lang>::RuntimeContext::State::DONE:
+          break;
+        }
       });
   }
 

@@ -75,7 +75,8 @@ e language */
     enum State {
       MATCH,
       WHERE,
-      BUILD
+      BUILD,
+      DONE,
     };
 
     State state = MATCH;
@@ -91,6 +92,8 @@ e language */
     void Bind(Parser::ParseResult<lang>&& parse_result) {
       this->binded_tree = parse_result.tree;
       this->binded_resource = std::move(parse_result);
+
+      state = MATCH;
     }
 
     Parser::ParseResult<lang> GetOutput() {
