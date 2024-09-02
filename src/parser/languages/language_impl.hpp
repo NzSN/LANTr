@@ -17,6 +17,13 @@ struct ParseResult;
 
 template<LANGUAGE L>
 struct ParseResult {
+  ParseResult():
+    input_stream_{},
+    input_{},
+    lexer_{},
+    tokens_{},
+    parser_{},
+    tree{} {}
   ParseResult(Base::Types::Source source):
     input_stream_{source},
     input_{std::make_unique<antlr4::ANTLRInputStream>(input_stream_)},
@@ -25,6 +32,20 @@ struct ParseResult {
     parser_{std::make_unique<typename LangParser<L>::type>(tokens_.get())},
     tree{Antlr4Entry<L>::GetEntry(*parser_)}
     {}
+  ParseResult(ParseResult&& another) {
+    *this = std::move(another);
+  }
+
+  ParseResult& operator=(ParseResult&& another) {
+    input_stream_ = std::move(another.input_stream_);
+    input_ = std::move(another.input_);
+    lexer_ = std::move(another.lexer_);
+    tokens_ = std::move(another.tokens_);
+    parser_ = std::move(another.parser_);
+    tree = another.tree;
+
+    return *this;
+  }
 
   // Caution: following resources is required to be lived otherwise
   //          tree is deaded.

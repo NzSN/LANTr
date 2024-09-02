@@ -40,7 +40,8 @@ public:
       ASSERT(source_tree != nullptr);
     }
 
-  /* Only when transfrom between the same language */
+  /* Only when transfrom between the sam
+e language */
   [[nodiscard]]
   Parser::LANGUAGE::ParseResult<lang>
   GenTargetAST() const {
@@ -70,6 +71,15 @@ public:
 
 
   struct RuntimeContext {
+
+    enum State {
+      MATCH,
+      WHERE,
+      BUILD
+    };
+
+    State state = MATCH;
+
     // The ast of the program that the rule to
     // transformed.
     Parser::ParseResult<lang> binded_resource;

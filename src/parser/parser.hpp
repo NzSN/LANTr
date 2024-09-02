@@ -15,6 +15,8 @@ template<LANGUAGE::LANGUAGE L>
 class [[nodiscard]] ParseResult {
   using Info = ParserInfo<LANGUAGE::ImplOfLang<L>::impl>;
 public:
+  ParseResult():
+    result_{}, tree_{}, tree{} {}
   ParseResult(LANGUAGE::ParseResult<L>&& r):
     result_{std::move(r)},
     tree_{Info::Tree::BuildFrom(result_.tree)},

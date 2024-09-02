@@ -7,6 +7,7 @@
 #include "rule.hpp"
 #include "parser/languages/language_definitions.hpp"
 #include <algorithm>
+#include <initializer_list>
 #include <utility>
 
 namespace P = ::LANTr::Parser;
@@ -43,14 +44,6 @@ requires(
   { t() } -> std::same_as<void>;
 };
 
-template<typename T>
-concept ConcreteStrategy =
-requires(T& t,
-  Base::Types::Source s,
-  AbstTree<LangOfStrategy<T>::lang> tree) {
-  { t() } -> std::same_as<void>;
-};
-
 template<LANGS::LANGUAGE lang>
 struct StraBase {
   StraBase(Rule<lang>& rule): rule_{rule} {}
@@ -67,12 +60,17 @@ public:
   MatchStra(Rule<lang>& rule):
     StraBase<lang>{rule} {
     static_assert(Strategy<MatchStra>);
-    static_assert(ConcreteStrategy<MatchStra<lang>>);
+  }
+
+  void operator()(Base::Types::Source s) {
+
   }
 
   void operator()() {
     PM::MatchResult<AbstTree<lang>> result =
-      Parser::AST::PatternMatch::Matching(, this->rule_.GetSourceTree());
+      Parser::AST::PatternMatch::Matching(
+        this->rule_.runtime_ctx.binded_tree,
+        this->rule_.GetSourceTree());
   }
 };
 
@@ -81,28 +79,70 @@ class WhereStra: public StraBase<lang> {
 public:
   WhereStra(Rule<lang>& rule):
     StraBase<lang>{rule} {
-    static_assert(ConcreteStrategy<MatchStra<lang>>);
+    static_assert(Strategy<WhereStra>);
   }
 
   void operator()(Base::Types::Source source) {
 
   }
+
+  void operator()() {
+
+  }
 };
 
 template<LANGS::LANGUAGE lang>
-using ConcreteStra = std::variant<
-  MatchStra<lang>,
-  WhereStra<lang>>;
-template<LANGS::LANGUAGE lang>
-void visitConcreteStra(ConcreteStra<lang>& stra) {
-  if (auto& s = stra.template get_if<MatchStra<lang>>()) {
-    s();
-  } else if (auto& s = stra.template get_if<WhereStra<lang>>()) {
-    s();
-  } else {
-    std::unreachable();
+class BuildStra: public StraBase<lang> {
+public:
+  BuildStra(Rule<lang>& rule): StraBase<lang>{rule} {
+    static_assert(Strategy<BuildStra>);
   }
-}
+
+  void operator()(Base::Types::Source source) {
+
+  }
+
+  void operator()() {
+
+  }
+};
+
+template<LANGS::LANGUAGE lang>
+using FirstOrderStra_t = std::variant<
+  MatchStra<lang>, WhereStra<lang>, BuildStra<lang>>;
+template<LANGS::LANGUAGE lang>
+struct FirstOrderStra: public StraBase<lang> {
+
+  FirstOrderStra(std::initializer_list<FirstOrderStra_t<lang>> stras):
+    StraBase<lang>{stras.size() > 0 ? static_cast<StraBase<lang>&>(*stras.begin()).rule_ : nullptr } {
+    static_assert(Strategy<FirstOrderStra>);
+
+    #if !NDEBUG
+    Rule<lang>* rule = nullptr;
+    for (auto& s: stras) {
+      if (rule == nullptr) {
+        rule = static_cast<StraBase<lang>&>(s).rule_;
+      } else {
+        ASSERT(rule == static_cast<StraBase<lang>&>(s).rule_);
+      }
+    }
+    #endif
+  }
+
+  void operator()(Base::Types::Source source) {
+
+  }
+
+  void operator()() {
+    std::for_each(
+      stras.begin(), stras.end(),
+      [](FirstOrderStra_t<lang>& stra) {
+
+      });
+  }
+
+  std::vector<FirstOrderStra_t<lang>> stras;
+};
 
 } // LANTr::Transformer
 
