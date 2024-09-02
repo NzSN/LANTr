@@ -16,7 +16,6 @@ namespace LANGS = ::LANTr::Parser::LANGUAGE;
 
 namespace LANTr::Transformer {
 
-
 template<LANGS::LANGUAGE lang>
 class Rule {
 public:
@@ -69,7 +68,30 @@ public:
     return target;
   }
 
+
+  struct RuntimeContext {
+    // The ast of the program that the rule to
+    // transformed.
+    Parser::ParseResult<lang> binded_resource;
+    Parser::AST::AbstTree<Tree>* binded_tree;
+
+    Parser::ParseResult<lang> output_resource;
+    Parser::AST::AbstTree<Tree>* output_tree;
+
+    void Bind(Parser::ParseResult<lang>&& parse_result) {
+      this->binded_tree = parse_result.tree;
+      this->binded_resource = std::move(parse_result);
+    }
+
+    Parser::ParseResult<lang> GetOutput() {
+      return output_resource;
+    }
+  };
+
+  RuntimeContext runtime_ctx;
+
 private:
+
   Types::Source source;
   Types::Source target;
 

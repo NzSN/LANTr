@@ -18,7 +18,7 @@ struct AbstTree {
 using Antlr4Tree = antlr4::tree::ParseTree;
 template<>
 class AbstTree<Antlr4Tree>: public Base::TreeLayer<AbstTree<Antlr4Tree>, Antlr4Tree>,
-                              public Matchable<AbstTree<Antlr4Tree>> {
+                            public Matchable<AbstTree<Antlr4Tree>> {
 private:
   using EqualFn = std::function<bool(const AbstTree&, const AbstTree&)>;
 

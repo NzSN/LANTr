@@ -6,26 +6,54 @@
 #include "parser/ast/pattern_matching/pattern_matching.hpp"
 #include "rule.hpp"
 #include "parser/languages/language_definitions.hpp"
+#include <algorithm>
+#include <utility>
 
 namespace P = ::LANTr::Parser;
 namespace LANGS = P::LANGUAGE;
 namespace AST = P::AST;
 namespace PM = P::AST::PatternMatch;
+namespace Types = ::LANTr::Base::Types;
 
 namespace LANTr::Transformer {
 
 template<LANGS::LANGUAGE lang>
-class Strategy {
-public:
-  using LangImpl = LANGS::ImplOfLang<lang>;
-  using TreeType = LANGS::TreeType<LangImpl::impl>;
-  using Tree     = Base::Tree<typename TreeType::type>;
-  using AbstTree = AST::AbstTree<Tree>;
+using LangImpl = LANGS::ImplOfLang<lang>;
+template<LANGS::LANGUAGE lang>
+using TreeType = LANGS::TreeType<LangImpl<lang>::impl>;
+template<LANGS::LANGUAGE lang>
+using Tree     = typename TreeType<lang>::type;
+template<LANGS::LANGUAGE lang>
+using AbstTree = AST::AbstTree<Tree<lang>>;
 
-  Strategy(Rule<lang>& rule): rule_{rule} {}
+template<typename T>
+struct LangOfStrategy;
+template<template<LANGS::LANGUAGE L> class T, LANGS::LANGUAGE L>
+struct LangOfStrategy<T<L>> {
+  constexpr static LANGS::LANGUAGE lang = L;
+};
 
-  virtual void operator()(Base::Types::Source source) = 0;
-  virtual void operator()(AbstTree& tree) = 0;
+template<typename T>
+concept Strategy =
+requires(
+  T& t,
+  Base::Types::Source s) {
+
+  { t(s) } -> std::same_as<void>;
+  { t() } -> std::same_as<void>;
+};
+
+template<typename T>
+concept ConcreteStrategy =
+requires(T& t,
+  Base::Types::Source s,
+  AbstTree<LangOfStrategy<T>::lang> tree) {
+  { t() } -> std::same_as<void>;
+};
+
+template<LANGS::LANGUAGE lang>
+struct StraBase {
+  StraBase(Rule<lang>& rule): rule_{rule} {}
 protected:
   Rule<lang>& rule_;
 };
@@ -34,23 +62,47 @@ protected:
 //                   Implementation of concrete Strategies                   //
 ///////////////////////////////////////////////////////////////////////////////
 template<LANGS::LANGUAGE lang>
-class MatchStrategy: public Strategy<lang> {
+class MatchStra: public StraBase<lang> {
 public:
-  using AbstTree = typename Strategy<lang>::AbstTree;
-
-  MatchStrategy(Rule<lang>& rule): Strategy<lang>{rule} {}
-
-  void operator()(Base::Types::Source source) override {
-    auto parseInfo = P::Parser<lang>::Parse(source);
-    this->operator()(parseInfo.tree);
+  MatchStra(Rule<lang>& rule):
+    StraBase<lang>{rule} {
+    static_assert(Strategy<MatchStra>);
+    static_assert(ConcreteStrategy<MatchStra<lang>>);
   }
 
-  void operator()(AbstTree& tree) override {
-    PM::MatchResult<AbstTree> result =
-      Parser::AST::PatternMatch::Matching(tree, this->rule_.GetSourceTree());
+  void operator()() {
+    PM::MatchResult<AbstTree<lang>> result =
+      Parser::AST::PatternMatch::Matching(, this->rule_.GetSourceTree());
+  }
+};
+
+template<LANGS::LANGUAGE lang>
+class WhereStra: public StraBase<lang> {
+public:
+  WhereStra(Rule<lang>& rule):
+    StraBase<lang>{rule} {
+    static_assert(ConcreteStrategy<MatchStra<lang>>);
+  }
+
+  void operator()(Base::Types::Source source) {
 
   }
 };
+
+template<LANGS::LANGUAGE lang>
+using ConcreteStra = std::variant<
+  MatchStra<lang>,
+  WhereStra<lang>>;
+template<LANGS::LANGUAGE lang>
+void visitConcreteStra(ConcreteStra<lang>& stra) {
+  if (auto& s = stra.template get_if<MatchStra<lang>>()) {
+    s();
+  } else if (auto& s = stra.template get_if<WhereStra<lang>>()) {
+    s();
+  } else {
+    std::unreachable();
+  }
+}
 
 } // LANTr::Transformer
 
