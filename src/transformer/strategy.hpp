@@ -15,7 +15,6 @@ namespace P = ::LANTr::Parser;
 namespace LANGS = P::LANGUAGE;
 namespace AST = P::AST;
 namespace PM = P::AST::PatternMatch;
-namespace Types = ::LANTr::Base::Types;
 
 namespace LANTr::Transformer {
 
@@ -100,55 +99,16 @@ public:
 };
 
 template<LANGS::LANGUAGE lang>
-using FirstOrderStra_t = std::variant<
-  MatchStra<lang>, WhereStra<lang>, BuildStra<lang>>;
-template<LANGS::LANGUAGE lang>
-struct FirstOrderStra: public StraBase<lang> {
+struct RuleBasedStra: public StraBase<lang> {
+  RuleBasedStra(Rule<lang>& rule) {}
 
-  FirstOrderStra(std::initializer_list<FirstOrderStra_t<lang>> stras):
-    StraBase<lang>{stras.size() > 0 ? static_cast<StraBase<lang>&>(*stras.begin()).rule_ : nullptr } {
-    static_assert(Strategy<FirstOrderStra>);
 
-    #if !NDEBUG
-    Rule<lang>* rule = nullptr;
-    for (auto& s: stras) {
-      if (rule == nullptr) {
-        rule = static_cast<StraBase<lang>&>(s).rule_;
-      } else {
-        ASSERT(rule == static_cast<StraBase<lang>&>(s).rule_);
-      }
-    }
-    #endif
-  }
-
-  void operator()() {
-    std::for_each(
-      stras.begin(), stras.end(),
-      [&](FirstOrderStra_t<lang>& stra) {
-        switch (this->rule_.runtime_ctx.state) {
-        case Rule<lang>::RuntimeContext::State::MATCH: {
-          auto s = std::get<MatchStra<lang>>(stra);
-          s();
-          break;
-        }
-        case Rule<lang>::RuntimeContext::State::WHERE: {
-          auto s = std::get<WhereStra<lang>>(stra);
-          s();
-          break;
-        }
-        case Rule<lang>::RuntimeContext::State::BUILD: {
-          auto s = std::get<BuildStra<lang>>(stra);
-          s();
-          break;
-        }
-        case Rule<lang>::RuntimeContext::State::DONE:
-          break;
-        }
-      });
-  }
-
-  std::vector<FirstOrderStra_t<lang>> stras;
+private:
+  std::tuple<MatchStra<lang>,
+             WhereStra<lang>,
+             BuildStra<lang>> stras;
 };
+
 
 } // LANTr::Transformer
 
