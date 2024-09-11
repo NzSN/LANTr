@@ -35,7 +35,7 @@ struct LangOfStrategy<T<L>> {
 };
 
 template<typename T>
-concept Strategy =
+concept is_strategy =
 requires(
   T& t,
   Base::Types::Source s) {
@@ -44,12 +44,15 @@ requires(
 };
 
 template<LANGS::LANGUAGE lang>
-struct StraBase {
-  StraBase(Rule<lang>& rule): rule_{rule} {}
+struct Strategy {
+  Strategy(Rule<lang>& rule): rule_{rule} {}
   void BindProgram(Base::Types::Source s) {
     Parser::ParseResult<lang> result = Parser::Parser<lang>::Parse(s);
     this->rule_.runtime_ctx.Bind(std::move(result));
   }
+
+  virtual void operator()() = 0;
+
 protected:
   Rule<lang>& rule_;
 };
@@ -58,14 +61,14 @@ protected:
 //                   Implementation of concrete Strategies                   //
 ///////////////////////////////////////////////////////////////////////////////
 template<LANGS::LANGUAGE lang>
-class MatchStra: public StraBase<lang> {
+class MatchStra: public Strategy<lang> {
 public:
   MatchStra(Rule<lang>& rule):
-    StraBase<lang>{rule} {
-    static_assert(Strategy<MatchStra>);
+    Strategy<lang>{rule} {
+    static_assert(is_strategy<MatchStra>);
   }
 
-  void operator()() {
+  void operator()() override {
     PM::MatchResult<AbstTree<lang>> result =
       Parser::AST::PatternMatch::Matching(
         this->rule_.runtime_ctx.binded_tree,
@@ -74,41 +77,29 @@ public:
 };
 
 template<LANGS::LANGUAGE lang>
-class WhereStra: public StraBase<lang> {
+class WhereStra: public Strategy<lang> {
 public:
   WhereStra(Rule<lang>& rule):
-    StraBase<lang>{rule} {
-    static_assert(Strategy<WhereStra>);
+    Strategy<lang>{rule} {
+    static_assert(is_strategy<WhereStra>);
   }
 
-  void operator()() {
+  void operator()() override {
 
   }
 };
 
 template<LANGS::LANGUAGE lang>
-class BuildStra: public StraBase<lang> {
+class BuildStra: public Strategy<lang> {
 public:
-  BuildStra(Rule<lang>& rule): StraBase<lang>{rule} {
-    static_assert(Strategy<BuildStra>);
+  BuildStra(Rule<lang>& rule): Strategy<lang>{rule} {
+    static_assert(is_strategy<BuildStra>);
   }
 
-  void operator()() {
+  void operator()() override {
 
   }
 };
-
-template<LANGS::LANGUAGE lang>
-struct RuleBasedStra: public StraBase<lang> {
-  RuleBasedStra(Rule<lang>& rule) {}
-
-
-private:
-  std::tuple<MatchStra<lang>,
-             WhereStra<lang>,
-             BuildStra<lang>> stras;
-};
-
 
 } // LANTr::Transformer
 
